@@ -1,0 +1,9 @@
+setup.py
+vegamite/API.py
+vegamite/__init__.py
+vegamite/config.py
+vegamite.egg-info/PKG-INFO
+vegamite.egg-info/SOURCES.txt
+vegamite.egg-info/dependency_links.txt
+vegamite.egg-info/requires.txt
+vegamite.egg-info/top_level.txt
