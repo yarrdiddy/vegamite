@@ -1,4 +1,4 @@
-import requests, base64, hashlib, hmac, time
+import requests, base64, hashlib, hmac, time, json
 
 from requests.auth import AuthBase
 from vegamite.config import config
@@ -37,18 +37,51 @@ class GDAXClient(object):
         self.api_root = config.gdax.api_root
         self.auth = GDAXAuth()
 
-    # Maybe refactor these out?
-    def _get_request(self, request_path):
-        return requests.get(request_path, auth=self.auth, timeout=30)
+    # Maybe refactor these out? Maybe conbine them
+    def _get_request(self, request_path, order_data=None):
+        try:
+            response = requests.get(request_path, auth=self.auth, timeout=30)
+        except requests.exceptions.Timeout:
+            # Log the exception
+            print(e)
+            return None
+        except requests.exceptions.TooManyRedirects:
+            # Log the exception
+            print(e)
+            return None
+        except requests.exceptions.RequestException as e:
+            # catastrophic error. bail.
+            print(e)
+            return None
+        return response
 
     def _post_request(self, request_path, order_data):
-        return requests.post(request_path, data=request_data, auth=self.auth, timeout=30)
+        # import ipdb; ipdb.set_trace()
+        try: 
+            response = requests.post(request_path, data=order_data, auth=self.auth, timeout=30)
+        except requests.exceptions.Timeout:
+            # Log the exception
+            print(e)
+            return None
+        except requests.exceptions.TooManyRedirects:
+            # Log the exception
+            print(e)
+            return None
+        except requests.exceptions.RequestException as e:
+            # catastrophic error. bail.
+            print(e)
+            return None
+        return response
 
     def validate_order(self, **kwargs):
         order_type = kwargs.get('order_type')   # Market/Limit/Stop
-        if order_type not in GDAXClient.ORDER_TYPES:
-            # RAISE AN ERROR!
-            raise ValueError
+        time_in_force = kwargs.get('time_in_force')
+        # import ipdb;ipdb.set_trace()
+        if order_type is not None and order_type not in GDAXClient.ORDER_TYPES:
+            raise ValueError('Invalid order type: %s. Should be one of: limit, market, or stop' %order_type)
+
+        if time_in_force is not None and time_in_force not in GDAXClient.TIME_IN_FORCE:
+            raise ValueError('Invalid time_in_force code: %s. Should be one of: GTC, GTT, IOC, or FOK' %time_in_force)
 
         product_id = kwargs.get('product_id', None)
 
@@ -61,14 +94,14 @@ class GDAXClient(object):
 
         if product_id is None:
             # Raise an exception here, please don't order nothing, and a default is dumb
-            return None
+            raise ValueError('No product_id supplied.')
 
     def get_account_list(self):
         request_path = self.api_root + '/accounts'
         return self._get_request(request_path)
 
     def get_account(self, account_id):
-        reuest_path = self.api_root + '/accounts/' + account_id
+        request_path = self.api_root + '/accounts/' + account_id
         return self._get_request(request_path)
 
     def get_account_history(self, account_id):
@@ -80,7 +113,13 @@ class GDAXClient(object):
         return self._get_request(request_path)
 
     def buy(self, **kwargs):
-        self.validate_order(kwargs)
+        # import ipdb;ipdb.set_trace()
+        kwargs['side'] = 'buy'
+        try:
+            self.validate_order(**kwargs)
+        except:
+            # Log something
+            return None
         request_path = self.api_root + '/orders'
         order_data = json.dumps(kwargs)
 
@@ -88,6 +127,7 @@ class GDAXClient(object):
 
 
     def sell(self, **kwargs):
+        kwargs['side'] = 'sell'
         self.validate_order(kwargs)
         request_path = self.api_root + '/orders'
         order_data = json.dumps(kwargs)

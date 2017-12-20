@@ -1,5 +1,7 @@
 {
   "vega/test/test_vegamite.py": true,
+  "vegamite/test/api/test_api.py::test_ehlo": true,
+  "vegamite/test/api/test_api.py::test_get": true,
   "vegamite/test/test_vegamite.py": true,
   "vegamite/test/test_vegamite.py::test_gdax_response": true,
   "vegamite/test/test_vegamite.py::test_order": true
