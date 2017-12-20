@@ -1,3 +1,6 @@
 {
-  "vegamite/test/test_vegamite.py::test_gdax_request_string": true
+  "vega/test/test_vegamite.py": true,
+  "vegamite/test/test_vegamite.py": true,
+  "vegamite/test/test_vegamite.py::test_gdax_response": true,
+  "vegamite/test/test_vegamite.py::test_order": true
 }

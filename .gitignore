@@ -1,1 +1,4 @@
 settings.yaml
+*.pyc
+*.egg
+*.egg-info
