@@ -12,32 +12,32 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 
 def read(*filenames, **kwargs):
-	return ''
+    return ''
 
 
 long_description = read('README.txt', 'CHANGES.txt')
 
 
 class PyTest(TestCommand):
-	def finalize_options(self):
-		TestCommand.finalize_options(self)
-		self.test_args = []
-		self.test_suite = True
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
 
-	def run_tests(self):
-		import pytest
-		errcode = pytest.main(self.test_args)
-		sys.exit(errcode)
+    def run_tests(self):
+        import pytest
+        errcode = pytest.main(self.test_args)
+        sys.exit(errcode)
 
 
 setup(
-	name='vegamite',
-	version=vegamite.__version__,
-	url='https://github.com/yarrdiddy/vegamite',
-	license='MIT License',
-	author='David Reynolds',
-	tests_require=['pytest'],
-	install_requires=['Flask>=0.10.1',
+    name='vegamite',
+    version=vegamite.__version__,
+    url='https://github.com/yarrdiddy/vegamite',
+    license='MIT License',
+    author='David Reynolds',
+    tests_require=['pytest'],
+    install_requires=['Flask>=0.10.1',
                     'Flask-SQLAlchemy>=1.0',
                     'SQLAlchemy==0.8.2',
                 ],
@@ -45,7 +45,7 @@ setup(
     author_email='d.reynoldz@gmail.com',
     description='Simple trading bot for cryptocurrency trading.',
     long_description=long_description,
-    packages=['vegamite'],
+    packages=['vegamite', 'vegamite/api'],
     include_package_data=True,
     platforms='any',
     test_suite='vegamite.test.test_vegamite',
