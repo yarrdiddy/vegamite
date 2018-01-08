@@ -8,17 +8,16 @@
 * Learn more about what the setup.py script is doing
 * Better way of managing versioning - probably one single standalone file
 	* Maybe look at that bumpversion thingy
-* Change vegamite to vega within the source
-* config object to be nested?
 
 
 ## Codebase
 
-* Finish up GDAX API stuff
-* Look into some other APIs
 * Database and data layer
 * Websockets for realtime data
 * Error handling and logging
+* Build API endpoints using flask
+* Wrap flask in gunicorn for async
+* Bundle everything in docker container
 
 
 ## Data

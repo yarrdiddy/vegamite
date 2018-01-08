@@ -1,5 +1,10 @@
 settings.yaml
 *.pyc
 *.egg
-*.egg-inf
+*.egg-info/
 build/
+.DS_Store
+celerybeat-schedule
+vegamite/__pycache__/
+.cache/
+*.log

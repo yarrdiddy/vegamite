@@ -1,6 +1,10 @@
 setup.py
+test/test_vegamite.py
 vegamite/__init__.py
+vegamite/app.py
 vegamite/config.py
+vegamite/data.py
+vegamite/model.py
 vegamite.egg-info/PKG-INFO
 vegamite.egg-info/SOURCES.txt
 vegamite.egg-info/dependency_links.txt
