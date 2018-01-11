@@ -1,4 +1,9 @@
+import time
+
 from celery import Celery
+from vegamite.data import MarketData, TimeSeriesClient
+
+ts_client = TimeSeriesClient()
 
 def make_celery(app):
     celery = Celery(app.import_name, broker=app.config['CELERY_BROKER_URL'])

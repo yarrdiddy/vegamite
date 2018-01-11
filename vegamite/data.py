@@ -33,6 +33,39 @@ class TimeSeriesClient(object):
             field_columns=field_columns,
             tag_columns=tag_columns)
 
+    def get_last_trade(self, exchange, symbol):
+        """
+        Return most recently saved trade for an exchange/symbol pair.
+        TODO: Fix table naming, still in development.
+        """
+        last_saved_trade = self.client.query(
+            """
+            select  last(timestamp) 
+            from    test_trade_data 
+            where   exchange = '%s' 
+            and     symbol = '%s'
+            """ % (exchange, symbol)
+        )
+        return last_saved_trade.get('test_trade_data')
+
+    def get_last_trade_times(exchange):
+        """
+        Return a dict of most recent saved trade times. Useful for paginating latest trade data.
+        """
+        last_saved_trades = self.client.query(
+            """
+            select  symbol, 
+                    last(price) 
+            from    test_trade_data 
+            where   exchange = '%s' 
+            group by symbol
+            """ % (exchange)
+        )
+        results = {}
+        for i in last_saved_trades.values():
+            if len(i) > 0:
+                results[i['symbol'].values[0]] = i.index[0]
+
 
 class MarketData(object):
     """
@@ -43,11 +76,12 @@ class MarketData(object):
         self.exchange = None
         self.exchange_code = exchange_code
         if exchange_code:
-            self.exchange = eval('ccxt.%s()' % exchange_code)
+            self = self.set_exchange(exchange_code)
 
     def set_exchange(self, exchange_code):
         self.exchange_code = exchange_code
         self.exchange = eval('ccxt.%s()' % self.exchange_code)
+        self.exchange.load_markets()
         return self        
     
     def get_all_exchanges(self, save=False, use_cached=False):
@@ -55,8 +89,7 @@ class MarketData(object):
         return exchanges
 
     def get_markets(self, save=False, use_cached=False):
-        markets = self.exchange.load_markets()
-        return markets
+        return self.exchange.markets
 
     def get_trend(self, symbol, resolution='1d', save=False, use_cached=False):
         ohlcv = self.exchange.fetch_ohlcv(symbol, resolution)
@@ -67,6 +100,14 @@ class MarketData(object):
 
         return ohlcv_dataframe
 
+    def get_trades(self, symbol, since=None):
+        trades = self.exchange.fetch_trades(symbol, since=since)
+        if len(trades) == 0:
+            return DataFrame()
+        data_frame = DataFrame(trades, columns=trades[0].keys())
+        data_frame['pd_timestamp'] = (data_frame['timestamp'] / 1000).apply(datetime.datetime.fromtimestamp)
+        data_frame.index = data_frame['pd_timestamp']
+        return data_frame
 
 
 
