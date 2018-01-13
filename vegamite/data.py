@@ -1,12 +1,34 @@
 import ccxt
 import datetime
+import redis
 
 from pandas import DataFrame
 from influxdb import DataFrameClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from vegamite.config import config
 
 random = 'foo'
+DB_CONNECTION = "mysql://{user}:{password}@{host}:{port}/{database}"
+
+def redis_client():
+    return redis.Redis(host=config.redis.host, port=config.redis.port, db=config.redis.db)
+
+
+def get_database_connection():
+    engine = create_engine(
+        DB_CONNECTION.format(
+            database=config.database.name,
+            user=config.database.user,
+            password=config.database.password,
+            host=config.database.host,
+            port=config.database.port
+        )
+    )
+    Session = sessionmaker(bind=engine)
+    return Session()
+
 
 class TimeSeriesClient(object):
     """
@@ -46,7 +68,10 @@ class TimeSeriesClient(object):
             and     symbol = '%s'
             """ % (exchange, symbol)
         )
-        return last_saved_trade.get('test_trade_data')
+        return_data = last_saved_trade.get('test_trade_data')
+        if return_data is None:
+            return_data = DataFrame()
+        return return_data
 
     def get_last_trade_times(exchange):
         """

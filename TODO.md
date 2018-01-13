@@ -16,19 +16,23 @@
 * Websockets for realtime data
 * Error handling and logging
 * Build API endpoints using flask
-* Wrap flask in gunicorn for async
 * Bundle everything in docker container
 
 
 ## Data
 
-* Determine data layer architecture
-	* Likely a combination of SQLite with redis and/or a persistent document store
-* Data model
+* Determine data layer architecture - DONE
+* Data model - As needed
 * Data flow design
+* Database: MySQL container setup, external volume - DONE
+* Database: Base data, tracking table - DONE
+* Connection pool for all databases
+	* MySQL
+	* InfluxDB
+	* Redis?
 
 
 ## Test coverage
 
 * Sure up existing test cases
-* 
+* Write more test cases

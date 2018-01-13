@@ -31,8 +31,10 @@ class Market(Base):
 	ccxt_market_id = Column(String(50)) # varchar(50) not null,
 	exchange_code = Column(String(50)) # varchar(50) not null,
 	symbol = Column(String(50)) # varchar(20) not null,
-	base_currency = Column(Integer) # smallint,
-	quote_currency = Column(Integer) # smallint,
+	base_currency = Column(String(3)) # smallint,
+	quote_currency = Column(String(3)) # smallint,
+	track_data = Column(String(1))
+	trade_market = Column(String(1))
 	last_updated = Column(DateTime) # datetime,
 	
 	def __repr__(self):
@@ -43,6 +45,8 @@ class Market(Base):
 			symbol='%s',
 			base_currency='%s',
 			quote_currency='%s',
+			track_data=%s,
+			trade_market=%s,
 			last_updated='%s'
 		)>""" % (
 			self.market_id, 
@@ -51,6 +55,10 @@ class Market(Base):
 			self.symbol,
 			self.base_currency,
 			self.quote_currency,
+			self.track_data,
+			self.trade_market,
 			self.last_updated
 		)
+
+
 

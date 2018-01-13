@@ -16,5 +16,10 @@ docker run --detach --name=test-mysql --env="MYSQL_ROOT_PASSWORD=mypassword" --p
 **InfluxDB**
 docker run --name=test-influxdb --detach -p 8086:8086 -v $VEGAMITE_DATA/influxdb:/var/lib/influxdb influxdb
 
+**Redis**
+docker run --name=vegamite-redis -p 6379:6379 -d redis
+
 **Useful commands**
 docker ps
+
+
