@@ -1,0 +1,32 @@
+---
+- name: Ensure mysql dirs exist
+  become: true
+  become_user: deploy
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: yes
+  with_items:
+    - "{{ mysql_backups_dir }}"
+    - "{{ mysql_conf_dir }}"
+    - "{{ mysql_lib_dir }}"
+
+- name: Run mysql server
+  become: true
+  become_user: deploy
+  docker_container:
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+      PYTHONPATH: "{{ ansible_env.PYTHONPATH }}"
+    image: mysql
+    name: "{{ mysql_container_name }}"
+    ports:
+      - "{{ mysql_port }}:3306"
+    pull: true
+    recreate: true
+    restart_policy: always
+    state: "{{ mysql_state }}"
+    volumes:
+      - "{{ mysql_backups_dir }}:/var/backups/mysql"
+      - "{{ mysql_conf_dir }}:/etc/mysql/conf.d"
+      - "{{ mysql_lib_dir }}:/var/lib/mysql"

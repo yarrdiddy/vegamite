@@ -1,0 +1,12 @@
+# ---
+mysql_backups_dir: "{{ ansible_env.APPLICATION_HOME }}/volumes/mysql/backups"
+mysql_character_set: utf8mb4
+mysql_collation: utf8mb4_unicode_520_ci
+mysql_conf_dir: "{{ ansible_env.APPLICATION_HOME }}/conf/mysql/conf.d"
+mysql_container_name: mysql
+mysql_env: {}
+mysql_lib_dir: "{{ ansible_env.APPLICATION_HOME }}/volumes/mysql/lib"
+mysql_network: mysql
+mysql_port: 3306
+mysql_state: started
+mysql_root_password: mypassword

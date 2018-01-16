@@ -1,0 +1,13 @@
+---
+- hosts: production
+  environment:
+    PYTHONPATH: "/home/ubuntu/.local/lib/python2.7/site-packages"
+    APPLICATION_HOME: "/app"
+  user: ubuntu
+  vars:
+    username: ubuntu
+  roles:
+    - common
+    - docker
+    - mysql
+    # - vegamite
