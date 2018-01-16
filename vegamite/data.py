@@ -1,16 +1,51 @@
 import ccxt
 import datetime
 import redis
+import time
 
 from pandas import DataFrame
 from influxdb import DataFrameClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from celery.utils.log import get_task_logger
+
 from vegamite.config import config
 
 random = 'foo'
 DB_CONNECTION = "mysql://{user}:{password}@{host}:{port}/{database}"
+
+logger = get_task_logger(__name__)
+
+class Singleton(type):
+    def __init__(self, *args, **kwargs):
+        self.__instance = None
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        if self.__instance is None:
+            self.__instance = super().__call__(*args, **kwargs)
+            return self.__instance
+        else:
+            return self.__instance
+
+
+class Database(metaclass=Singleton):
+    def __init__(self):
+        self.engine = create_engine(
+            DB_CONNECTION.format(
+                database=config.database.name,
+                user=config.database.user,
+                password=config.database.password,
+                host=config.database.host,
+                port=config.database.port
+            )
+        )
+        self.Session = sessionmaker(bind=self.engine)
+
+    def get_session(self):
+        return self.Session()
+
 
 def redis_client():
     return redis.Redis(host=config.redis.host, port=config.redis.port, db=config.redis.db)
@@ -30,7 +65,7 @@ def get_database_connection():
     return Session()
 
 
-class TimeSeriesClient(object):
+class TimeSeriesClient(metaclass=Singleton):
     """
     Time series object for interacting with the InfluxDB instance. Get/retrieve methods for time series data.
     
@@ -94,7 +129,7 @@ class TimeSeriesClient(object):
 
 class MarketData(object):
     """
-    Market data class for getting and retrieving market data stored in InfluxDB.
+    Market data class for getting and retrieving market data.
     """
 
     def __init__(self, exchange_code=None):
@@ -102,6 +137,16 @@ class MarketData(object):
         self.exchange_code = exchange_code
         if exchange_code:
             self = self.set_exchange(exchange_code)
+        self.redis_client = redis_client()
+        self.ts_client = TimeSeriesClient()
+
+    def __enter__(self):
+        self.redis_client.set('lock_%s' % self.exchange_code, 'true')
+        return self
+
+    def __exit__(self, exc_ty, exc_val, tb):
+        time.sleep(self.exchange.rateLimit / 1000)
+        self.redis_client.set('lock_%s' % self.exchange_code, 'false')
 
     def set_exchange(self, exchange_code):
         self.exchange_code = exchange_code
@@ -134,17 +179,34 @@ class MarketData(object):
         data_frame.index = data_frame['pd_timestamp']
         return data_frame
 
+    def latest_trades(self, exchange, symbol):
+        """
+        Given and exchange, poll the market data for the given symbol and save it in InfluxDB.
+        """
+        market_data = MarketData(exchange)
+        ts_client = TimeSeriesClient()
 
+        last_saved_trade = ts_client.get_last_trade(exchange, symbol)
+        last_timestamp = 0
 
-class StaticData(object):
-    """
-    Static data class for interacting wit hstatic data stored in MySQL.
-    """
-    pass
+        if len(last_saved_trade.index) > 0:
+            last_timestamp = int(last_saved_trade['last'])
 
+        return market_data.get_trades(symbol, since=last_timestamp)
 
-class CacheClient(object):
-    """
-    Object for interacting with the cache.
-    """
-    pass
+    def save_latest_trades(self, symbol):
+        trades = self.latest_trades(self.exchange_code, symbol)
+
+        if len(trades.index) == 0:
+            logger.info('No new trades for %s' % (symbol))
+        else:
+            self.ts_client.write_dataframe(
+                trades[['symbol', 'side', 'id', 'price', 'amount', 'timestamp']],
+                'test_trade_data',
+                tags={
+                    'exchange': self.exchange_code
+                },
+                tag_columns=['symbol', 'side']
+            )
+            logger.info('Wrote %s trades for %s' % (len(trades.index), symbol))
+

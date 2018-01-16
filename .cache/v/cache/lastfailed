@@ -1,4 +1,5 @@
 {
+  "test/test_vegamite.py::TestTimeSeries::()::test_get_last_trade": true,
   "vega/test/test_vegamite.py": true,
   "vegamite/test/api/test_api.py::test_ehlo": true,
   "vegamite/test/api/test_api.py::test_get": true,
