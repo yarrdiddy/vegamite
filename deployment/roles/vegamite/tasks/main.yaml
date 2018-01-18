@@ -1,0 +1,46 @@
+---
+- include_vars:
+    file: vars/git_private_key.yaml
+
+- name: Setup vegamite virtualenv
+  become: true
+  become_user: deploy
+  command: "python3 -m venv {{ ansible_env.APPLICATION_HOME }}/vega-env"
+
+- name: ensure github.com is a known host
+  become: true
+  become_user: deploy
+  lineinfile:
+    dest: "{{ ansible_env.APPLICATION_HOME }}/.ssh/known_hosts"
+    state: present
+    create: yes
+    regexp: "^github\\.com"
+    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
+
+- name: Copy encrypted private key
+  become: true
+  become_user: deploy
+  copy:
+    content: "{{ key }}"
+    dest: "{{ ansible_env.APPLICATION_HOME }}/.ssh/id_rsa_vegamite"
+    mode: 0600
+
+- name: Clone git repository
+  become: true
+  become_user: deploy
+  git:
+    repo: "ssh://git@github.com/yarrdiddy/vegamite.git"
+    dest: "~/vega-env/vegamite"
+    key_file: "~/.ssh/id_rsa_vegamite"
+    accept_hostkey: yes
+    version: development
+
+- name: Install vegamite into virtualenv
+  become: true
+  become_user: deploy
+  pip:
+    virtualenv_python: python3
+    virtualenv: "{{ ansible_env.APPLICATION_HOME }}/vega-env/"
+    chdir: "{{ ansible_env.APPLICATION_HOME }}/vega-env/vegamite"
+    # name: "{{ ansible_env.APPLICATION_HOME }}/vega-env/vegamite"
+    requirements: "{{ ansible_env.APPLICATION_HOME }}/vega-env/vegamite/requirements.txt"

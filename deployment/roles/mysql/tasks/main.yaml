@@ -1,15 +1,24 @@
 ---
 - name: Ensure mysql dirs exist
   become: true
-  become_user: deploy
   file:
     path: "{{ item }}"
     state: directory
+    owner: deploy
+    group: docker
+    mode: 0755
     recurse: yes
   with_items:
     - "{{ mysql_backups_dir }}"
     - "{{ mysql_conf_dir }}"
     - "{{ mysql_lib_dir }}"
+
+- name: Install mysql libs
+  become: true
+  apt:
+    name: libmysqlclient-dev
+    state: latest
+    update_cache: true
 
 - name: Run mysql server
   become: true

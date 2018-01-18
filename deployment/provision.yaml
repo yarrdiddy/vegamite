@@ -7,7 +7,9 @@
   vars:
     username: ubuntu
   roles:
-    - common
-    - docker
-    - mysql
-    # - vegamite
+    # - common
+    # - docker
+    # - mysql
+    # - influxdb
+    # - redis
+    - vegamite

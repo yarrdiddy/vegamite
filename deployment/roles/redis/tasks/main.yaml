@@ -1,0 +1,15 @@
+---
+- name: Start redis container
+  become: true
+  become_user: deploy
+  docker_container:
+    env:
+      PYTHONPATH: "{{ ansible_env.PYTHONPATH }}"
+    image: redis
+    name: "{{ redis_container_name }}"
+    ports:
+      - "{{ redis_port }}:{{ redis_port }}"
+    pull: true
+    recreate: true
+    restart_policy: always
+    state: "{{ redis_state }}"

@@ -12,12 +12,25 @@
     groups: docker
     home: "{{ ansible_env.APPLICATION_HOME }}"
 
-- name: Install Python 2.7
+- name: Configure app home permissions
+  become: true
+  file:
+    path: "{{ ansible_env.APPLICATION_HOME }}"
+    state: directory
+    owner: deploy
+    group: docker
+    mode: 0755
+
+- name: "Install Python 2.7, 3 and virtualenv"
   become: true
   apt:
-    name: python2.7
+    name: "{{ item }}"
     state: latest
-    update_cache: yes
+    update_cache: true
+  with_items:
+    - python2.7
+    - python3
+    - python3-venv
 
 - name: Open permissions for site-packages
   file:
@@ -27,10 +40,12 @@
 # - name: Set python to python 2.7
 
 - name: Install pip
-  # become: true
+  become: true
   apt:
     name: python-pip
     state: latest
+    update_cache: yes
+
 
 # - name: Install pip for deploy user
 #   become: true
@@ -47,5 +62,11 @@
 #     state: link
 
 - name: Install docker-py
-  pip: 
+  pip:
     name: docker-py
+    umask: "0022"
+    extra_args: --force-reinstall
+  become: True
+
+
+
