@@ -9,7 +9,7 @@
   become: true
   user:
     name: deploy
-    groups: docker
+    groups: docker,deploy
     home: "{{ ansible_env.APPLICATION_HOME }}"
 
 - name: Configure app home permissions
@@ -21,7 +21,7 @@
     group: docker
     mode: 0755
 
-- name: "Install Python 2.7, 3 and virtualenv"
+- name: "Install Python 2.7, 3 and virtualenv, rabbitmq"
   become: true
   apt:
     name: "{{ item }}"
@@ -31,35 +31,13 @@
     - python2.7
     - python3
     - python3-venv
+    - rabbitmq-server
+    - python-pip
 
 - name: Open permissions for site-packages
   file:
     path: "{{ ansible_env.PYTHONPATH }}"
     mode: ugo+rx
-
-# - name: Set python to python 2.7
-
-- name: Install pip
-  become: true
-  apt:
-    name: python-pip
-    state: latest
-    update_cache: yes
-
-
-# - name: Install pip for deploy user
-#   become: true
-#   become_user: deploy
-#   apt:
-#     name: python-pip
-#     state: latest
-
-# - name: Link pip3 to pip
-#   become: true
-#   file:
-#     src: /usr/bin/pip3
-#     dest: /usr/bin/pip
-#     state: link
 
 - name: Install docker-py
   pip:
@@ -67,6 +45,8 @@
     umask: "0022"
     extra_args: --force-reinstall
   become: True
+
+
 
 
 

@@ -2,6 +2,16 @@
 - include_vars:
     file: vars/git_private_key.yaml
 
+- set_fact:
+    celery_bin_path: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}/bin/celery"
+    vegamite_app: "vegamite.tasks"
+    celery_app_path: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}/vegamite"
+    logging_path: "{{ ansible_env.APPLICATION_HOME }}/logs/vegamite"
+    pid_path: "{{ ansible_env.APPLICATION_HOME }}/pid/vegamite"
+    celery_user: deploy
+    celery_group: deploy
+    celery_opts: "-B"
+
 - name: Setup vegamite virtualenv
   become: true
   become_user: deploy
@@ -22,16 +32,16 @@
   become_user: deploy
   copy:
     content: "{{ key }}"
-    dest: "{{ ansible_env.APPLICATION_HOME }}/.ssh/id_rsa_vegamite"
+    dest: "{{ ansible_env.APPLICATION_HOME }}/.ssh/{{ privatekey_name }}"
     mode: 0600
 
 - name: Clone git repository
   become: true
   become_user: deploy
   git:
-    repo: "ssh://git@github.com/yarrdiddy/vegamite.git"
-    dest: "~/vega-env/vegamite"
-    key_file: "~/.ssh/id_rsa_vegamite"
+    repo: '{{ github_repo }}'
+    dest: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}/vegamite"
+    key_file: "~/.ssh/{{ privatekey_name }}"
     accept_hostkey: yes
     version: development
 
@@ -40,7 +50,27 @@
   become_user: deploy
   pip:
     virtualenv_python: python3
-    virtualenv: "{{ ansible_env.APPLICATION_HOME }}/vega-env/"
-    chdir: "{{ ansible_env.APPLICATION_HOME }}/vega-env/vegamite"
+    virtualenv: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}/"
+    chdir: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}/vegamite"
     # name: "{{ ansible_env.APPLICATION_HOME }}/vega-env/vegamite"
-    requirements: "{{ ansible_env.APPLICATION_HOME }}/vega-env/vegamite/requirements.txt"
+    requirements: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}/vegamite/requirements.txt"
+
+# TODO
+- name: Initialize mysql database with vegamite schema and data
+  become: true
+  become_user: deploy
+  shell: "source bin/activate && python vegamite/scripts/setup_database.py"
+  args:
+    chdir: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}"
+
+
+- name: Celery daemon script
+  become: true
+  template:
+    src: templates/celeryd.js
+    dest: "~/celeryd"
+
+
+
+
+

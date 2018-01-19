@@ -1,0 +1,4 @@
+# ---
+virtualenv_name: vega-env
+github_repo: "ssh://git@github.com/yarrdiddy/vegamite.git"
+privatekey_name: id_rsa_vegamite
