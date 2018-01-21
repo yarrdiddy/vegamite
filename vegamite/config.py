@@ -22,7 +22,7 @@ def convert_to_namedtuple(config_data):
     return namedtuple('ConfigDict', config_data.keys())(*config_data.values())
 
 def parse_configuration(config_file):
-    with open(app_home + '/vegamite/' + config_file) as _file:
+    with open(app_home + '/conf/vegamite/' + config_file) as _file:
         settings = yaml.load(_file)
         return convert_to_namedtuple(settings)
 

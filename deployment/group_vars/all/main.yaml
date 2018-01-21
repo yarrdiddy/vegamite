@@ -30,3 +30,6 @@ redis_db: 0
 # celery:
 celery_broker_url: 'pyamqp://guest@localhost'
 celery_result_backend: 'redis://localhost'
+
+# vegamite
+vegamite_config_dir: "{{ ansible_env.APPLICATION_HOME }}/conf/vegamite"

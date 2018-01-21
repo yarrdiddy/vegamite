@@ -67,11 +67,11 @@
     # name: "{{ ansible_env.APPLICATION_HOME }}/vega-env/vegamite"
     requirements: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}/vegamite/requirements.txt"
 
-- name: "Ensure {{ ansible_env.APPLICATION_HOME }}/config/vegamite/ dir exists"
+- name: "Ensure {{ ansible_env.APPLICATION_HOME }}/conf/vegamite/ dir exists"
   become: true
   become_user: deploy
   file: 
-    path: "{{ ansible_env.APPLICATION_HOME }}/config/vegamite" 
+    path: "{{ vegamite_config_dir }}" 
     state: directory
 
 - name: Copy vegamite configuration file
@@ -79,7 +79,7 @@
   become_user: deploy
   template:
     src: settings.j2
-    dest: "{{ ansible_env.APPLICATION_HOME }}/config/vegamite/settings.yaml"
+    dest: "{{ vegamite_config_dir }}/settings.yaml"
     mode: 0600
 
 - name: Initialize mysql database with vegamite schema and data
