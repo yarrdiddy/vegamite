@@ -13,7 +13,7 @@ class Configuration(object):
             for name in settings.keys():
                 self.__dict__.update(settings)
 
-app_home = os.environ['VEGAMITE_HOME']
+app_home = os.environ['HOME']
 
 def convert_to_namedtuple(config_data):
     for key, value in config_data.items():
