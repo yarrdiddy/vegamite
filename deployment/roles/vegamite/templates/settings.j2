@@ -1,0 +1,22 @@
+database:
+  name: {{ mysql_name }}
+  password: {{ mysql_password }}
+  host: {{ mysql_host }}
+  port: {{ mysql_port }}
+  user: {{ mysql_user }}
+
+influx:
+  host: {{ influxdb_host }}
+  port: {{ influxdb_port }}
+  user: {{ influxdb_user }}
+  password: {{ influxdb_password }}
+  name: {{ influxdb_name }}
+
+redis:
+  host: {{ redis_host }}
+  port: {{ redis_port }}
+  db: {{ redis_db }}
+
+celery:
+  broker_url: {{ celery_broker_url }}
+  result_backend: {{ celery_result_backend }}

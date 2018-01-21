@@ -6,9 +6,9 @@ from collections import namedtuple
 class Configuration(object):
     def __init__(self, config_file):
 
-        self.app_home = os.environ['VEGAMITE_HOME']
+        self.app_home = os.environ['HOME']
 
-        with open(self.app_home + '/vegamite/' + config_file) as config_file:
+        with open(self.app_home + '/config/vegamite/' + config_file) as config_file:
             settings = yaml.load(config_file)
             for name in settings.keys():
                 self.__dict__.update(settings)

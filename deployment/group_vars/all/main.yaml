@@ -1,0 +1,32 @@
+# Mysql
+mysql_name: vegamite
+mysql_password: mypassword
+mysql_host: 0.0.0.0
+mysql_user: root
+mysql_backups_dir: "{{ ansible_env.APPLICATION_HOME }}/volumes/mysql/backups"
+mysql_character_set: utf8mb4
+mysql_collation: utf8mb4_unicode_520_ci
+mysql_conf_dir: "{{ ansible_env.APPLICATION_HOME }}/conf/mysql/conf.d"
+mysql_container_name: mysql
+mysql_env: {}
+mysql_lib_dir: "{{ ansible_env.APPLICATION_HOME }}/volumes/mysql/lib"
+mysql_network: mysql
+mysql_port: 3306
+mysql_state: started
+mysql_root_password: mypassword
+
+# influxdb
+influxdb_host: 0.0.0.0
+influxdb_port: 8086 
+influxdb_user: root
+influxdb_password: root
+influxdb_name: vegamite
+
+# redis:
+redis_host: 0.0.0.0
+redis_port: 6379
+redis_db: 0
+
+# celery:
+celery_broker_url: 'pyamqp://guest@localhost'
+celery_result_backend: 'redis://localhost'

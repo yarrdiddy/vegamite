@@ -12,6 +12,18 @@
     celery_group: deploy
     celery_opts: "-B"
 
+- name: Set environment
+  become: true
+  become_user: deploy
+  lineinfile:
+    path: "{{ ansible_env.APPLICATION_HOME }}/.profile"
+    line: "{{ item }}"
+    state: present
+    create: yes
+  with_items:
+    - "export VEGAMITE_HOME={{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}"
+    - "export VEGAMITE_DATA={{ ansible_env.APPLICATION_HOME }}/volumes/vegamite/data"
+
 - name: Setup vegamite virtualenv
   become: true
   become_user: deploy
@@ -55,20 +67,41 @@
     # name: "{{ ansible_env.APPLICATION_HOME }}/vega-env/vegamite"
     requirements: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}/vegamite/requirements.txt"
 
-# TODO
+- name: "Ensure {{ ansible_env.APPLICATION_HOME }}/config/vegamite/ dir exists"
+  become: true
+  become_user: deploy
+  file: 
+    path: "{{ ansible_env.APPLICATION_HOME }}/config/vegamite" 
+    state: directory
+
+- name: Copy vegamite configuration file
+  become: true
+  become_user: deploy
+  template:
+    src: settings.j2
+    dest: "{{ ansible_env.APPLICATION_HOME }}/config/vegamite/settings.yaml"
+    mode: 0600
+
 - name: Initialize mysql database with vegamite schema and data
   become: true
   become_user: deploy
-  shell: "source bin/activate && python vegamite/scripts/setup_database.py"
+  shell: "source ~/.profile && source bin/activate && python vegamite/scripts/setup_database.py"
   args:
     chdir: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}"
+    executable: /bin/bash
 
 
 - name: Celery daemon script
   become: true
   template:
-    src: templates/celeryd.js
-    dest: "~/celeryd"
+    src: celeryd.j2
+    dest: "/etc/default/celeryd"
+
+- name: Start celery daemon
+  become: true
+  shell: "serive start celeryd"
+
+
 
 
 
