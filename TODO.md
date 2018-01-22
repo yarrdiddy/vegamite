@@ -9,6 +9,35 @@
 * Better way of managing versioning - probably one single standalone file
 	* Maybe look at that bumpversion thingy
 
+* Ansible steps: DONE
+	* Create a user/role for the app
+	* Create a home directory: /app/vegamite
+	* Clone git into home directory
+	* User/role/home for docker
+	* Install docker
+	* Set up volumes for databases
+	* MySQL, docker container, config and volume
+	* InfluxDB, docker container, config and volume
+	* Redis container, config
+	* Create virtualenv for vegamite and activate
+	* Python dependencies - requirements.txt
+	* Build and deploy vegamite in virtualenv
+	* Daemonize celery and run
+
+Ansible modes:
+* Provision new instance
+	* Set up users
+	* Install dependencies
+	* Docker images
+	* Git pull install etc
+	* Initialize database
+	* Start worker
+* Deploy new version of app
+	* Stop worker
+	* Git pull
+	* Install
+	* Start worker
+
 
 ## Codebase
 
@@ -17,6 +46,7 @@
 * Error handling and logging
 * Build API endpoints using flask
 * Bundle everything in docker container
+* Organize tasks back into tasks module.
 
 
 ## Data
@@ -30,6 +60,8 @@
 	* MySQL
 	* InfluxDB
 	* Redis?
+* Cache tracked markets, periodically updating the cache on its own schedule.
+	* Cache fall-through when checking.
 
 
 ## Test coverage

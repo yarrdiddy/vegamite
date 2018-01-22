@@ -6,10 +6,12 @@
   user: ubuntu
   vars:
     username: ubuntu
+    initialize_database: true
+    initial_exchanges: "gdax"
   roles:
-    # - common
-    # - docker
-    # - mysql
-    # - influxdb
-    # - redis
+    - common
+    - docker
+    - mysql
+    - influxdb
+    - redis
     - vegamite

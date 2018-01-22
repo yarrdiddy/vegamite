@@ -31,8 +31,8 @@ class Market(Base):
 	ccxt_market_id = Column(String(50)) # varchar(50) not null,
 	exchange_code = Column(String(50)) # varchar(50) not null,
 	symbol = Column(String(50)) # varchar(20) not null,
-	base_currency = Column(String(3)) # smallint,
-	quote_currency = Column(String(3)) # smallint,
+	base_currency = Column(String(50)) # smallint,
+	quote_currency = Column(String(50)) # smallint,
 	track_data = Column(String(1))
 	trade_market = Column(String(1))
 	last_updated = Column(DateTime) # datetime,

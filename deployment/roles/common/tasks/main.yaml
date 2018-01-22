@@ -21,6 +21,17 @@
     group: docker
     mode: 0755
 
+- name: Set environment
+  become: true
+  become_user: deploy
+  lineinfile:
+    path: "{{ ansible_env.APPLICATION_HOME }}/.profile"
+    line: "{{ item }}"
+    state: present
+    create: yes
+  with_items:
+    - "export APP_HOME={{ ansible_env.APPLICATION_HOME }}"
+
 - name: "Install Python 2.7, 3 and virtualenv, rabbitmq"
   become: true
   apt:

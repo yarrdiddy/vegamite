@@ -12,6 +12,15 @@
     celery_group: deploy
     celery_opts: "-B"
 
+- name: Check if Celery Service Exists
+  stat: path=/etc/init.d/celeryd
+  register: service_status
+
+- name: Stop Celery Service
+  become: true
+  command: "/etc/init.d/celeryd stop"
+  when: service_status.stat.exists
+
 - name: Set environment
   become: true
   become_user: deploy
@@ -86,21 +95,25 @@
 - name: Initialize mysql database with vegamite schema and data
   become: true
   become_user: deploy
-  shell: "source ~/.profile && source bin/activate && python vegamite/scripts/setup_database.py"
+  shell: "source ~/.profile && source bin/activate && python vegamite/scripts/setup_database.py -r -c -t -e {{ initial_exchanges }}"
   args:
     chdir: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}"
     executable: /bin/bash
+  when: initialize_database
 
-
-- name: Celery daemon script
+- name: Celery daemon config
   become: true
   template:
-    src: celeryd.j2
-    dest: "/etc/default/celeryd"
+    src: "{{ item.name }}"
+    dest: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { name: celeryd_config.j2, path: "/etc/default/celeryd", mode: "u=rw,g=r,o=r"}
+    - { name: celeryd.j2, path: "/etc/init.d/celeryd", mode: "u=rwx,g=rx,o=rx" }
 
 - name: Start celery daemon
   become: true
-  shell: "serive start celeryd"
+  command: "/etc/init.d/celeryd start"
 
 
 
