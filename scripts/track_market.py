@@ -12,14 +12,14 @@ parser = argparse.ArgumentParser()
 # parser.add_argument('-e', '--exchange', help='Initial list of exchanges to enter.', nargs='+')
 parser.add_argument('-s', '--symbol', help="Market to track", type=str)
 parser.add_argument('-e', '--exchange', help="Exchange to track", type=str)
+parser.add_argument('-t', '--track', action='store_true')
+parser.add_argument('-S', '--stop', action='store_true')
 
 args = parser.parse_args()
 
-def main():
-	symbol = args.symbol
-	exchange = args.exchange.upper()
+database = Database()
 
-	database = Database()
+def track_one_market(exchange, symbol):
 	session = database.get_session()
 
 	market_object = session.query(Market).filter_by( 
@@ -32,6 +32,43 @@ def main():
 	session.commit()
 	session.close()
 
+
+def track_exchange(exchange):
+	session = database.get_session()
+
+	market_query = session.query(Market).filter_by(exchange_code=exchange)
+
+	for market in market_query:
+		market.track_data = 'T'
+
+	session.commit()
+	session.close()
+
+
+def stop_tracking_market(exchange, symbol):
+	pass
+
+
+def stop_tracking_exchange(exchange):
+	pass
+
+
+def main():
+	_symbol = args.symbol
+	_exchange = args.exchange.upper()
+	_track = args.track
+	_stop = args.stop
+
+	if _track:
+		if _symbol is not None and _exchange is not None:
+			track_one_market(_exchange, _symbol)
+		elif _symbol is None and _exchange is not None:
+			track_exchange(_exchange)
+	elif _stop:
+		if _symbol is not None and _exchange is not None:
+			stop_tracking_market(_exchange, _symbol)
+		elif _symbol is None and _exchange is not None:
+			stop_tracking_exchange(_exchange)
 
 
 if __name__ == '__main__':
