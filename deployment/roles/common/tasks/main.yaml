@@ -11,6 +11,7 @@
     name: deploy
     groups: docker,deploy
     home: "{{ ansible_env.APPLICATION_HOME }}"
+    shell: /bin/bash
 
 - name: Configure app home permissions
   become: true

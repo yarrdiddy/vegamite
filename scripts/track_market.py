@@ -21,8 +21,7 @@ def main():
 
 	database = Database()
 	session = database.get_session()
-	
-	import ipdb; ipdb.set_trace()
+
 	market_object = session.query(Market).filter_by( 
         exchange_code=exchange.upper(), 
         symbol=symbol

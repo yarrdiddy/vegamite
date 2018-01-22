@@ -3,6 +3,7 @@
   environment:
     PYTHONPATH: "/home/ubuntu/.local/lib/python2.7/site-packages"
     APPLICATION_HOME: "/app"
+    APP_HOME: "/app"
   user: ubuntu
   vars:
     username: ubuntu
@@ -10,8 +11,8 @@
     initial_exchanges: "gdax"
   roles:
     - common
-    - docker
-    - mysql
-    - influxdb
-    - redis
+    # - docker
+    # - mysql
+    # - influxdb
+    # - redis
     - vegamite
