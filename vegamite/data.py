@@ -203,7 +203,7 @@ class MarketData(object):
         else:
             self.ts_client.write_dataframe(
                 trades[['symbol', 'side', 'id', 'price', 'amount', 'timestamp']],
-                ts_client.trade_data_table,
+                self.ts_client.trade_data_table,
                 tags={
                     'exchange': self.exchange_code
                 },
