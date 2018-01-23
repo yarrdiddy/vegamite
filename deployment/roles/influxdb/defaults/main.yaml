@@ -2,7 +2,7 @@
 influxdb_backups_dir: "{{ ansible_env.APPLICATION_HOME }}/volumes/influxdb/backups"
 influxdb_conf_dir: "{{ ansible_env.APPLICATION_HOME }}/conf/influxdb"
 influxdb_container_name: influxdb
-influxdb_lib_dir: "{{ ansible_env.APPLICATION_HOME }}/volumes/influxdb/lib"
+influxdb_lib_dir: "{{ ansible_env.APPLICATION_HOME }}/volumes/influxdb"
 influxdb_port: 8086
 influxdb_state: started
 # mysql_root_password: mypassword

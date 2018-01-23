@@ -6,11 +6,19 @@
     state: directory
     owner: deploy
     group: docker
-    mode: 0755
+    mode: 0775
     recurse: yes
   with_items:
     - "{{ influxdb_conf_dir }}"
     - "{{ influxdb_lib_dir }}"
+
+- name: Copy influx configuration file
+  become: true
+  become_user: deploy
+  template:
+    src: influxdb_config.j2
+    dest: "{{ influxdb_conf_dir }}/influxdb.conf"
+    mode: 0755
 
 - name: Run influxdb server
   become: true
@@ -28,5 +36,5 @@
     restart_policy: always
     state: "{{ influxdb_state }}"
     volumes:
-      - "{{ influxdb_conf_dir }}:/etc/influxdb"
-      - "{{ influxdb_lib_dir }}:/var/lib/influxdb"
+      - "{{ influxdb_conf_dir }}:/etc/influxdb:ro"
+      - "{{ influxdb_lib_dir }}:/var/lib/influxdb:rw"

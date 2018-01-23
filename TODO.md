@@ -10,9 +10,9 @@
 	* Maybe look at that bumpversion thingy
 
 * Ansible steps: DONE
-	* Create a user/role for the app
-	* Create a home directory: /app/vegamite
-	* Clone git into home directory
+	* Create a user/role for the app - DONE (deploy)
+	* Create a home directory: /app/vegamite - DONE
+	* Clone git into home directory - DONE
 	* User/role/home for docker
 	* Install docker
 	* Set up volumes for databases
@@ -22,7 +22,8 @@
 	* Create virtualenv for vegamite and activate
 	* Python dependencies - requirements.txt
 	* Build and deploy vegamite in virtualenv
-	* Daemonize celery and run
+	* Daemonize celery and run - DONE
+
 
 Ansible modes:
 * Provision new instance
@@ -41,27 +42,36 @@ Ansible modes:
 
 ## Codebase
 
-* Database and data layer
+* Database and data layer - DONE (ish)
+	* Need to formalize database conventions - table names and users
 * Websockets for realtime data
 * Error handling and logging
-* Build API endpoints using flask
 * Bundle everything in docker container
-* Organize tasks back into tasks module.
+* Organize tasks back into tasks module. DONE
+* Logs should quiet down
+* Logs should be rotated
+* Externalize celery beat schedule
 
 
 ## Data
 
 * Determine data layer architecture - DONE
 * Data model - As needed
-* Data flow design
+* Data flow design - Mostly DONE
 * Database: MySQL container setup, external volume - DONE
 * Database: Base data, tracking table - DONE
 * Connection pool for all databases
-	* MySQL
-	* InfluxDB
-	* Redis?
+	* MySQL - Now implemented as singleton, has its own pool.
+	* InfluxDB - Now a singleton, has its own pool.
 * Cache tracked markets, periodically updating the cache on its own schedule.
 	* Cache fall-through when checking.
+	* For now, just readin from mysql, very little cost.
+* Instantiate singletons per worker init.
+
+
+## Analytics
+
+
 
 
 ## Test coverage

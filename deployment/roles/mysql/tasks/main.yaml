@@ -6,7 +6,7 @@
     state: directory
     owner: deploy
     group: docker
-    mode: 0755
+    mode: 0775
     recurse: yes
   with_items:
     - "{{ mysql_backups_dir }}"

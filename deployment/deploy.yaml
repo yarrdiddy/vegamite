@@ -2,9 +2,10 @@
 - hosts: production
   environment:
     APPLICATION_HOME: "/app"
-  user: deploy
+    APP_HOME: "/app"
+  user: ubuntu
   vars:
-    username: deploy
+    username: ubuntu
     initialize_database: false
   roles:
     - vegamite

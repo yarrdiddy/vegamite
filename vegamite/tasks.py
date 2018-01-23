@@ -32,7 +32,7 @@ def make_celery(app):
     
 
 celery.conf.beat_schedule = {
-    'test_run_2_seconds': {
+    'poll_new_trades': {
         'task': 'vegamite.tasks.poll_market_data',
         'schedule': 10.0
     }
@@ -40,7 +40,7 @@ celery.conf.beat_schedule = {
 
 
 @celery.task()
-def poll_market_data():
+def poll_new_trades():
     # Read data from redis, fallback to database if empty
     # TODO: Really want a DB connection pool here
     session = database.get_session()
@@ -62,7 +62,7 @@ def poll_market_data():
         if not exchange_lock:
             get_exchange_data.delay(exchange, symbols)
         else:
-            logger.info('Exchange %s is locked.' % exchange)
+            logger.debug('Exchange %s is locked.' % exchange)
     session.close()
     
 
@@ -90,7 +90,7 @@ def get_exchange_data(exchange, symbol):
 @celery.task()
 def query_gdax_ohlcv():
     ohlcv_data = exchange.get_trend('BTC/USD', '1m')
-    logger.info('Collected gdax %s rows of ohlcv data' % len(ohlcv_data.index))
+    logger.debug('Collected gdax %s rows of ohlcv data' % len(ohlcv_data.index))
     
     ts_client.write_dataframe(
         ohlcv_data,
@@ -102,7 +102,7 @@ def query_gdax_ohlcv():
         }, 
         field_columns=['open', 'high', 'low', 'close', 'volume'],
     )
-    logger.info('Wrote %s rows to Influxdb' % len(ohlcv_data.index))
+    logger.debug('Wrote %s rows to Influxdb' % len(ohlcv_data.index))
 
 
 # celery.conf.beat_schedule = {

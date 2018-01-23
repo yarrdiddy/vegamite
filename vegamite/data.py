@@ -98,7 +98,7 @@ class TimeSeriesClient(metaclass=Singleton):
         last_saved_trade = self.client.query(
             """
             select  last(timestamp) 
-            from    test_trade_data 
+            from    trade_data 
             where   exchange = '%s' 
             and     symbol = '%s'
             """ % (exchange, symbol)
@@ -116,7 +116,7 @@ class TimeSeriesClient(metaclass=Singleton):
             """
             select  symbol, 
                     last(price) 
-            from    test_trade_data 
+            from    trade_data 
             where   exchange = '%s' 
             group by symbol
             """ % (exchange)
@@ -198,7 +198,7 @@ class MarketData(object):
         trades = self.latest_trades(self.exchange_code, symbol)
 
         if len(trades.index) == 0:
-            logger.info('No new trades for %s' % (symbol))
+            logger.debug('No new trades for %s' % (symbol))
         else:
             self.ts_client.write_dataframe(
                 trades[['symbol', 'side', 'id', 'price', 'amount', 'timestamp']],
@@ -208,5 +208,5 @@ class MarketData(object):
                 },
                 tag_columns=['symbol', 'side']
             )
-            logger.info('Wrote %s trades for %s' % (len(trades.index), symbol))
+            logger.debug('Wrote %s trades for %s' % (len(trades.index), symbol))
 
