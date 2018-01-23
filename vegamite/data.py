@@ -80,6 +80,7 @@ class TimeSeriesClient(metaclass=Singleton):
             config.influx.name
         )
         self.protocol = 'json'
+        self.trade_data_table = 'trade_data'
 
     def write_dataframe(self, dataframe, series, tags=None, field_columns=None, tag_columns=None):
         self.client.write_points(
@@ -98,17 +99,17 @@ class TimeSeriesClient(metaclass=Singleton):
         last_saved_trade = self.client.query(
             """
             select  last(timestamp) 
-            from    trade_data 
+            from    %s 
             where   exchange = '%s' 
             and     symbol = '%s'
-            """ % (exchange, symbol)
+            """ % (self.trade_data_table, exchange, symbol)
         )
-        return_data = last_saved_trade.get('test_trade_data')
+        return_data = last_saved_trade.get(self.trade_data_table)
         if return_data is None:
             return_data = DataFrame()
         return return_data
 
-    def get_last_trade_times(exchange):
+    def get_last_trade_times(self, exchange):
         """
         Return a dict of most recent saved trade times. Useful for paginating latest trade data.
         """
@@ -116,10 +117,10 @@ class TimeSeriesClient(metaclass=Singleton):
             """
             select  symbol, 
                     last(price) 
-            from    trade_data 
+            from    %s 
             where   exchange = '%s' 
             group by symbol
-            """ % (exchange)
+            """ % (self.trade_data_table, exchange)
         )
         results = {}
         for i in last_saved_trades.values():
@@ -202,7 +203,7 @@ class MarketData(object):
         else:
             self.ts_client.write_dataframe(
                 trades[['symbol', 'side', 'id', 'price', 'amount', 'timestamp']],
-                'trade_data',
+                ts_client.trade_data_table,
                 tags={
                     'exchange': self.exchange_code
                 },
