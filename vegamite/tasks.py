@@ -33,7 +33,7 @@ def make_celery(app):
 
 celery.conf.beat_schedule = {
     'poll_new_trades': {
-        'task': 'vegamite.tasks.poll_market_data',
+        'task': 'vegamite.tasks.poll_new_trades',
         'schedule': 10.0
     }
 }
