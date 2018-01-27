@@ -211,37 +211,6 @@ class MarketData(object):
         logger.debug('Fetched %s trades: %s, %s.' % (len(data_frame.index), self.exchange_code, symbol))
         return self
 
-    def latest_trades(self, exchange, symbol):
-        """
-        Given and exchange, poll the market data for the given symbol and save it in InfluxDB.
-        """
-        market_data = MarketData(exchange)
-        ts_client = TimeSeriesClient()
-
-        last_saved_trade = ts_client.get_last_trade(exchange, symbol)
-        last_timestamp = 0
-
-        if len(last_saved_trade.index) > 0:
-            last_timestamp = int(last_saved_trade['last'])
-
-        return market_data.get_trades(symbol, since=last_timestamp)
-
-    def save_latest_trades(self, symbol):
-        trades = self.latest_trades(self.exchange_code, symbol)
-
-        if len(trades.index) == 0:
-            logger.debug('No new trades for %s' % (symbol))
-        else:
-            self.ts_client.write_dataframe(
-                trades[['symbol', 'side', 'id', 'price', 'amount', 'timestamp']],
-                self.ts_client.trade_data_table,
-                tags={
-                    'exchange': self.exchange_code
-                },
-                tag_columns=['symbol', 'side']
-            )
-            logger.debug('Wrote %s trades for %s' % (len(trades.index), symbol))
-
 
     def save(self):
 
