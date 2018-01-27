@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import pytest
 import numpy as np
 
 # import ipdb; ipdb.set_trace()
@@ -17,18 +18,29 @@ test_exchange = 'gdax'
 symbol = 'BTC/USD'
 
 
+class MockTSResponse():
+    def get_last_query(self, query_string):
+        # ipdb.set_trace()
+        print('yay!')
+        return 'cunt!'
+
+@pytest.fixture()
+def mock_get_last_query(monkeypatch):
+    monkeypatch.setattr('influxdb.DataFrameClient.query', MockTSResponse.get_last_query)
+
+
 class TestTimeSeries(object):
 
     def setup(self):
         self.client = TimeSeriesClient()
         self.exchange = MarketData(exchange_code=test_exchange)
 
+    @pytest.mark.usefixtures("mock_write_points")
     def test_write_points(self):
-        #ipdb.set_trace()
         test_data = self.exchange.get_trend('BTC/USD', '1d')
         self.client.write_dataframe(
             test_data, 
-            'test_data', 
+            'trend_data', 
             tags={
                 'exchange': test_exchange,
                 'symbol': 'BTC/USD',
@@ -36,20 +48,17 @@ class TestTimeSeries(object):
             }, 
             field_columns=['open', 'high', 'low', 'close', 'volume'], 
         )
-        # Don't want to piss off the gods during testing
-        time.sleep(1)
+        # This test will fail in the fixture... its was written to test the test.
+        assert True
 
-        # FIXME: client.client seems dumb...
-        result = self.client.client.query('select * from test_data')
-        assert len(result['test_data']) > 0
-
+    @pytest.mark.usefixtures("mock_write_points")
     def test_write_trades(self):
         trades = self.exchange.get_trades(symbol, since=0)
         # ipdb.set_trace()
         last_timestamp = trades['timestamp'].max()
         self.client.write_dataframe(
             trades[['symbol', 'side', 'id', 'price', 'amount']],
-            'test_trade_data',
+            'trade_data',
             tags={
                 'exchange': 'gdax'
             },
@@ -58,8 +67,13 @@ class TestTimeSeries(object):
         time.sleep(1)
 
     def test_get_last_trade(self):
-        ipdb.set_trace()
+        #ipdb.set_trace()
         last_saved_trade = self.client.get_last_trade(test_exchange, symbol)
+
+    # @pytest.mark.usefixtures("mock_get_last_query")
+    def test_get_last(self):
+        ipdb.set_trace()
+        last_val = self.client.get_last(test_exchange, symbol, 'trade')
         
 
 
@@ -106,18 +120,7 @@ class TestMarketData(object):
         )
         time.sleep(2)
 
-        last_saved_trade = ts_client.get_last_trade(test_exchange, symbol)
-        last_timestamp = 0
-        
-        if len(last_saved_trade.index) > 0:
-            last_timestamp = last_saved_trade.index[0].value / 1e6
-            last_timestamp = np.int64(last_timestamp)
-        
-        since = trades['timestamp'].max()
-
-        new_trades = self.market_data.get_trades(symbol, since=since)
-        print(since, since.__class__)
-        print(last_timestamp, last_timestamp.__class__)
+        last_saved_trade = self.market_data.latest_trades(self.exchange, 'BTC/USD')
         ipdb.set_trace()
         # assert len(trades.index) > len(new_trades.index)
         print(len(trades.index), len(new_trades.index))

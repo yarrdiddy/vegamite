@@ -1,4 +1,10 @@
 {
+  "test/test_data.py": true,
+  "test/test_data.py::TestMarketData::()::test_get_trades": true,
+  "test/test_vegamite.py": true,
+  "test/test_vegamite.py::TestMarketData::()::test_get_trades": true,
+  "test/test_vegamite.py::TestMarketData::()::test_get_trend": true,
+  "test/test_vegamite.py::TestTimeSeries::()::test_get_last": true,
   "test/test_vegamite.py::TestTimeSeries::()::test_get_last_trade": true,
   "vega/test/test_vegamite.py": true,
   "vegamite/test/api/test_api.py::test_ehlo": true,

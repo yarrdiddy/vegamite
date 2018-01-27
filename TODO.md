@@ -51,6 +51,7 @@ Ansible modes:
 * Logs should quiet down
 * Logs should be rotated
 * Externalize celery beat schedule
+* Instantiate singletons per worker init.
 
 
 ## Data
@@ -66,10 +67,16 @@ Ansible modes:
 * Cache tracked markets, periodically updating the cache on its own schedule.
 	* Cache fall-through when checking.
 	* For now, just readin from mysql, very little cost.
-* Instantiate singletons per worker init.
+
+Data to store:
+* Trade data - constantly. Periodically downsample.
+* Trend data (ohlcv) - constantly.
+	* Multiple resolutions: 
 
 
 ## Analytics
+
+* Most basic analytics will be covered by pandas, so we can use these directly
 
 
 
@@ -78,3 +85,5 @@ Ansible modes:
 
 * Sure up existing test cases
 * Write more test cases
+* WRITE TESTS!!!
+

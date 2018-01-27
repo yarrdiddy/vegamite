@@ -1,19 +1,26 @@
 from __future__ import print_function
+
+import io, codecs, os, sys, re
+
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
-import io
-import codecs
-import os
-import sys
 
-import vegamite
 
 here = os.path.abspath(os.path.dirname(__file__))
+
+VERSIONFILE="src/vegamite/_version.py"
+
+verstrline = open(VERSIONFILE, "rt").read()
+VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+match_object = re.search(VSRE, verstrline, re.M)
+if match_object:
+    version_str = match_object.group(1)
+else:
+    raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
 
 
 def read(*filenames, **kwargs):
     return ''
-
 
 long_description = read('README.txt', 'CHANGES.txt')
 
@@ -32,7 +39,7 @@ class PyTest(TestCommand):
 
 setup(
     name='vegamite',
-    version=vegamite.__version__,
+    version=version_str,
     url='https://github.com/yarrdiddy/vegamite',
     license='MIT License',
     author='David Reynolds',
@@ -41,7 +48,8 @@ setup(
     author_email='d.reynoldz@gmail.com',
     description='Simple trading bot for cryptocurrency trading.',
     long_description=long_description,
-    packages=['vegamite', 'vegamite/api'],
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
     include_package_data=True,
     platforms='any',
     test_suite='vegamite.test.test_vegamite',
