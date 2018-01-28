@@ -1,12 +1,10 @@
-import requests
-import json
-import time
-import pytest
+import requests, json, time, pytest, datetime
 import numpy as np
 
 # import ipdb; ipdb.set_trace()
 from vegamite.config import config
-from vegamite.data import MarketData, TimeSeriesClient
+from vegamite.data import MarketData, TimeSeriesClient, redis_client
+from vegamite.tasks import queue_tasks, get_exchange_data
 
 import ipdb
 api_base = config.gdax.api_root
@@ -16,7 +14,7 @@ passphrase = config.gdax.passphrase
 
 test_exchange = 'gdax'
 symbol = 'BTC/USD'
-
+r = redis_client()
 
 class MockTSResponse():
     def get_last_query(self, query_string):
@@ -70,10 +68,10 @@ class TestTimeSeries(object):
         #ipdb.set_trace()
         last_saved_trade = self.client.get_last_trade(test_exchange, symbol)
 
-    # @pytest.mark.usefixtures("mock_get_last_query")
+    @pytest.mark.usefixtures("mock_get_last_trend")
     def test_get_last(self):
-        ipdb.set_trace()
-        last_val = self.client.get_last(test_exchange, symbol, 'trade')
+        # ipdb.set_trace()
+        last_val = self.client.get_last(test_exchange, symbol, 'trend')
         
 
 
@@ -101,9 +99,45 @@ class TestMarketData(object):
 
     def test_get_trend(self):
         # import ipdb; ipdb.set_trace()
-        self.market_data.get_trend('BTC/USD', freq='1d').save()
+        self.market_data = self.market_data.get_trend('BTC/USD', freq='1d')
+
+        self.market_data.save()
 
     def test_get_trades(self):
         # import ipdb; ipdb.set_trace()
-        self.market_data.get_trades(symbol)
+        self.market_data = self.market_data.get_trades(symbol)
+
+        self.market_data.save()
+
+    def test_global_lock(self):
+        # ipdb.set_trace()
+        test_lock = {'id': 12345, 'expire': 0}
+        r.set('lock_gdax', json.dumps(test_lock))
+        
+        # Lock has expired
+        self.market_data.lock()
+
+        expire_time = datetime.datetime.now() + datetime.timedelta(1)
+        test_lock2 = {'id': 12345, 'expire': expire_time.timestamp()}
+
+        # Lock has not expired, but belongs to market_data
+        self.market_data._id = 12345
+        self.market_data.release()
+
+
+    def test_wait(self):
+        task1 = '{"task": "trade_data", "symbol": "ETH/EUR"}'
+        task2 = '{"task": "trade_data", "symbol": "BTC/USD"}'
+
+        r.delete('gdax-tasks')
+        r.lpush('gdax-tasks', task1, task2)
+
+        get_exchange_data('gdax')
+
+
+
+# def test_poll_new_trades():
+#     poll_new_trades('trade_data')
+#     get_exchange_data('gdax')
+
 
