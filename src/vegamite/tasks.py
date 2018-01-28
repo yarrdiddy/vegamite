@@ -47,7 +47,7 @@ celery.conf.beat_schedule = {
     'run_market_data_tasks':{
         'task': 'vegamite.tasks.poll_exchanges',
         'schedule': 10.0,
-    }
+    },
     'poll_5m_trend': {
         'task': 'vegamite.tasks.poll_new_trades',
         'schedule': crontab(minute=0, hour='*'),
