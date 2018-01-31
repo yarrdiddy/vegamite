@@ -10,3 +10,5 @@ vegamite/__pycache__/
 *.log
 STORIES.md
 requirements/*
+celerybeat-schedule.db
+deployment/deploy.retry

@@ -67,6 +67,7 @@ class TimeSeriesClient(metaclass=Singleton):
         self.trade_data_table = 'trade_data'
 
     def write_dataframe(self, dataframe, series, tags=None, field_columns=None, tag_columns=None):
+        logger.debug('Wrote %s points to InfluxDB' % len(series.index))
         self.client.write_points(
             dataframe, 
             series,
@@ -257,9 +258,8 @@ class MarketData(object):
                     },
                     tag_columns=_tags[result_name]
                 )
-            except:
-                print(result_name)
-                print(result_data)
+            except Exception as e:
+                logger.info(e)
 
         self.result.clear()
         return self
