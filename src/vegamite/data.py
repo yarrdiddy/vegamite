@@ -67,7 +67,7 @@ class TimeSeriesClient(metaclass=Singleton):
         self.trade_data_table = 'trade_data'
 
     def write_dataframe(self, dataframe, series, tags=None, field_columns=None, tag_columns=None):
-        logger.debug('Wrote %s points to InfluxDB' % len(series.index))
+        logger.debug('Wrote %s points to InfluxDB' % len(dataframe.index))
         self.client.write_points(
             dataframe, 
             series,
@@ -179,7 +179,6 @@ class MarketData(object):
         return self.exchange.markets
 
     def get_trend(self, symbol, freq='1d', since=None, latest=True, wait=True):
-        # import ipdb; ipdb.set_trace()
         last_timestamp = 0
         
         if latest:

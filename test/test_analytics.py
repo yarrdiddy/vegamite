@@ -7,7 +7,6 @@ def test_simulation_run():
 
 	sim = sim.fetch()
 	# sim = sim.run()
-
+	import ipdb; ipdb.set_trace()
 	for i in range(1000):
-		sim = sim.run()
-		sim.save()
+		sim = sim.run().save()

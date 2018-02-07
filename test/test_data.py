@@ -6,6 +6,8 @@ from vegamite.config import config
 from vegamite.data import MarketData, TimeSeriesClient, redis_client
 from vegamite.tasks import queue_tasks, get_exchange_data
 
+from mocks import MockData
+
 import ipdb
 api_base = config.gdax.api_root
 api_key = config.gdax.api_key
@@ -31,11 +33,13 @@ class TestTimeSeries(object):
 
     def setup(self):
         self.client = TimeSeriesClient()
-        self.exchange = MarketData(exchange_code=test_exchange)
 
     @pytest.mark.usefixtures("mock_write_points")
     def test_write_points(self):
-        test_data = self.exchange.get_trend('BTC/USD', '1d')
+        """
+        Test write points, this is achieving very little but forces the code to be run.
+        """
+        test_data = MockData.TREND_DATA
         self.client.write_dataframe(
             test_data, 
             'trend_data', 
@@ -46,14 +50,12 @@ class TestTimeSeries(object):
             }, 
             field_columns=['open', 'high', 'low', 'close', 'volume'], 
         )
-        # This test will fail in the fixture... its was written to test the test.
+        # This test will fail in the fixture... it was written to test the test.
         assert True
 
     @pytest.mark.usefixtures("mock_write_points")
     def test_write_trades(self):
-        trades = self.exchange.get_trades(symbol, since=0)
-        # ipdb.set_trace()
-        last_timestamp = trades['timestamp'].max()
+        trades = MockData.TRADE_DATA
         self.client.write_dataframe(
             trades[['symbol', 'side', 'id', 'price', 'amount']],
             'trade_data',
@@ -62,15 +64,10 @@ class TestTimeSeries(object):
             },
             tag_columns=['symbol', 'side']
         )
-        time.sleep(1)
+        assert True
 
-    def test_get_last_trade(self):
-        #ipdb.set_trace()
-        last_saved_trade = self.client.get_last_trade(test_exchange, symbol)
-
-    @pytest.mark.usefixtures("mock_get_last_trend")
+    @pytest.mark.usefixtures("mock_last_trend")
     def test_get_last(self):
-        # ipdb.set_trace()
         last_val = self.client.get_last(test_exchange, symbol, 'trend')
         
 
@@ -82,7 +79,6 @@ class TestMarketData(object):
         self.market_data = MarketData(exchange_code=self.exchange)
     
     def test_set_exchange(self):
-        # import ipdb; ipdb.set_trace()
         new_market_data = self.market_data.set_exchange('bitfinex')
         assert new_market_data.exchange_code == 'bitfinex'
         self.market_data = self.market_data.set_exchange(test_exchange)
@@ -97,11 +93,11 @@ class TestMarketData(object):
         time.sleep(1)
         assert len(markets) > 0
 
+    @pytest.mark.usefixtures("mock_exchange")
     def test_get_trend(self):
-        # import ipdb; ipdb.set_trace()
-        self.market_data = self.market_data.get_trend('BTC/USD', freq='1d')
+        self.market_data = self.market_data.get_trend('BTC/USD', freq='1d', wait=False)
 
-        self.market_data.save()
+        assert len(self.market_data.result['trend_data'].index) == 10
 
     def test_get_trades(self):
         # import ipdb; ipdb.set_trace()
