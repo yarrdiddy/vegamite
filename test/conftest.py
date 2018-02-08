@@ -21,4 +21,6 @@ def mock_last_trend(monkeypatch):
 @pytest.fixture()
 def mock_exchange(monkeypatch):
     monkeypatch.setattr('ccxt.gdax.fetch_ohlcv', MockExchange.fetch_ohlcv)
+    monkeypatch.setattr('ccxt.gdax.fetch_trades', MockExchange.fetch_trades)
     monkeypatch.setattr('influxdb.DataFrameClient.query', MockInfluxDB.query_last_trend)
+    monkeypatch.setattr('influxdb.DataFrameClient.write_points', MockInfluxDB.write_points)

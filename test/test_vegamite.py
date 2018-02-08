@@ -17,6 +17,7 @@ passphrase = config.gdax.passphrase
 test_exchange = 'gdax'
 symbol = 'BTC/USD'
 
+# TODO: Obsolete tests. Remove this file.
 
 class MockTSResponse():
     def get_last_query(self, query_string):

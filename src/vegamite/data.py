@@ -15,6 +15,7 @@ MEASUREMENTS = ['trade_data', 'trend_data']
 
 logger = get_task_logger(__name__)
 
+# TODO: Put this into a base module
 class Singleton(type):
     def __init__(self, *args, **kwargs):
         self.__instance = None
@@ -133,7 +134,8 @@ class MarketData(object):
         # print('Exiting...')
         self.release()
 
-    def __check_lock(self):
+    # TODO: Refactor lock out into its own class
+    def _check_lock(self):
         # import ipdb; ipdb.set_trace()
         current_lock = self.redis_client.get('lock_%s' % self.exchange_code)
         time_check = datetime.datetime.now()
@@ -150,18 +152,17 @@ class MarketData(object):
                 # print('Exchange is locked by another')
                 raise Exception('Exchange %s is locked by another task.' % self.exchange_code)
         else:
-            print('Not locked')
             return None
 
     def lock(self):
-        lock_state = self.__check_lock()
+        lock_state = self._check_lock()
         if lock_state is None:
             d = datetime.datetime.now() + datetime.timedelta(0, 30)
             _lock = {'id': self._id, 'expire': d.timestamp()}
             self.redis_client.set('lock_%s' % self.exchange_code, json.dumps(_lock))
 
     def release(self):
-        lock_state = self.__check_lock()
+        lock_state = self._check_lock()
         if lock_state == 'mine':
             self.redis_client.delete('lock_%s' % self.exchange_code)
         
@@ -179,6 +180,7 @@ class MarketData(object):
         return self.exchange.markets
 
     def get_trend(self, symbol, freq='1d', since=None, latest=True, wait=True):
+        self._check_lock()
         last_timestamp = 0
         
         if latest:
@@ -209,6 +211,7 @@ class MarketData(object):
 
     def get_trades(self, symbol, since=None, latest=True, wait=True):
         # import ipdb; ipdb.set_trace()
+        self._check_lock()
         last_timestamp = 0
         
         if latest:

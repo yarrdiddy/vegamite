@@ -1,25 +1,37 @@
-## To put in this file:
+## Vegamite
 
-* A description of your project
-* Links to the project's ReadTheDocs page
-* A TravisCI button showing the state of the build
-* "Quickstart" documentation (how to quickly install and use your project)
-* A list of non-Python dependencies (if any) and how to install them
+A small crypto trading platform designed to track analyse, and eventually book trades algorithmically. Vegamite is a python based application using celery to execute a number of scheduled tasks, storing results in an InfluxDB database.
 
-Thanks [https://jeffknupp.com/blog/2013/08/16/open-sourcing-a-python-project-the-right-way/](https://jeffknupp.com/blog/2013/08/16/open-sourcing-a-python-project-the-right-way/)
+Just a fun project to play around with some new toys and keep myself coding.
 
-## Docker startup commands:
+## Quickstart
 
-**MySQL**
-docker run --detach --name=test-mysql --env="MYSQL_ROOT_PASSWORD=mypassword" --publish 6603:3306 --volume=/Users/dave/code/root/container/test-mysql/conf.d/:/etc/mysql/conf.d mysql
+Everything can be provisioned and deployed via the ansibles playbooks in the deployment section. You will need to provide a host location and your own private key in order to make it run.
 
-**InfluxDB**
-docker run --name=test-influxdb --detach -p 8086:8086 -v $VEGAMITE_DATA/influxdb:/var/lib/influxdb influxdb
+Target host addresses can be found in /deployment/hosts.
 
-**Redis**
-docker run --name=vegamite-redis -p 6379:6379 -d redis
+You will need to provide your own github private key, located in /deployment/vars/git_private_key.yaml
 
-**Useful commands**
-docker ps
+Example provisioning and deployment:
+
+    $ ansible-playbook provision.yaml --private-key=~/.ssh/YOUR_PRIVATE_KEY.pem -v --vault-password-file ~/.your_local_password_file.txt
+
+To do a plain deploy just run the deploy.yaml playbook instead.
+
+## Manual quickstart
+
+Vegamite depends on InfluxDB, MySQL and redis, so these dependencies will need to be set up and configured. We'll assume that these are up and running.
+
+To configure, simply set up the configurations for each in /settings.yaml.
+
+To deploy, create a python 3 virtualenv and run:
+    $ pip install --upgrade .
+from the root directory.
+
+To start, simply start the celery, and celerybeat workers, eg:
+    $ celery -A vegamite.tasks worker -B --loglevel=info
+
+Alternatively a celeryd configuration template is included in the deployment directory.
+
 
 

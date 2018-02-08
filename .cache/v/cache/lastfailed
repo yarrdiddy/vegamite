@@ -1,7 +1,6 @@
 {
   "test/test_analytics.py": true,
   "test/test_data.py": true,
-  "test/test_data.py::TestMarketData::()::test_get_trend": true,
   "test/test_tasks.py::test_poll_exchanges": true,
   "test/test_vegamite.py": true,
   "test/test_vegamite.py::TestMarketData::()::test_get_trades": true,

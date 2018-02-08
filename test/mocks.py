@@ -34,6 +34,43 @@ class MockData():
         [1517184000000, 11536, 11570, 10840, 11123.01, 3993.4809011101333],
     ]
 
+    RAW_TRADES = [
+        {
+            'id': '36525850', 
+            'info': {'time': '2018-02-08T01:35:25.448Z', 'trade_id': 36525850, 'price': '7823.45000000', 'size': '0.11041171', 'side': 'sell'}, 
+            'timestamp': 1518053725448, 
+            'datetime': '2018-02-08T01:35:25.448Z', 
+            'symbol': 'BTC/USD', 
+            'type': None, 
+            'side': 'buy', 
+            'price': 7823.45, 
+            'amount': 0.11041171, 
+            'fee': None
+        }, {
+            'id': '36525849', 
+            'info': {'time': '2018-02-08T01:35:25.432Z', 'trade_id': 36525849, 'price': '7823.45000000', 'size': '0.36686431', 'side': 'sell'}, 
+            'timestamp': 1518053725432, 
+            'datetime': '2018-02-08T01:35:25.432Z', 
+            'symbol': 'BTC/USD', 
+            'type': None, 
+            'side': 'buy', 
+            'price': 7823.45, 
+            'amount': 0.36686431, 
+            'fee': None
+        }, {
+            'id': '36525848', 
+            'info': {'time': '2018-02-08T01:35:23.804Z', 'trade_id': 36525848, 'price': '7823.44000000', 'size': '0.00210621', 'side': 'buy'}, 
+            'timestamp': 1518053723804, 
+            'datetime': '2018-02-08T01:35:24.804Z', 
+            'symbol': 'BTC/USD', 
+            'type': None, 
+            'side': 'sell', 
+            'price': 7823.44, 
+            'amount': 0.00210621, 
+            'fee': None
+        }
+    ]
+
 
 class MockInfluxDB():
     def write_points(self, data, measurement, tags, **kwargs):
@@ -50,13 +87,21 @@ class MockInfluxDB():
         return {'trade_data': last_df}
 
     def query_last_trend(self, query):
-        data = MockData.TREND_DATA
+        if 'trend_data' in query:
+            data = MockData.TREND_DATA
+        elif 'trade_data' in query:
+            data = MockData.TRADE_DATA
         last_df = DataFrame(data, index=[0])
+        last_df = last_df.rename(columns=dict(zip(last_df.columns, ['last_' + c for c in last_df.columns])))
         return {'trade_data': last_df}
 
 
 class MockExchange():
     def fetch_ohlcv(self, symbol, freq, since=None):
         return MockData.RAW_OHLCV
+
+    def fetch_trades(self, symbol, since=None):
+        return MockData.RAW_TRADES
+
 
 

@@ -96,44 +96,47 @@ class TestMarketData(object):
     @pytest.mark.usefixtures("mock_exchange")
     def test_get_trend(self):
         self.market_data = self.market_data.get_trend('BTC/USD', freq='1d', wait=False)
-
         assert len(self.market_data.result['trend_data'].index) == 10
 
+    @pytest.mark.usefixtures("mock_exchange")
     def test_get_trades(self):
-        # import ipdb; ipdb.set_trace()
-        self.market_data = self.market_data.get_trades(symbol)
+        self.market_data = self.market_data.get_trades('BTC/USD', wait=False)
+        assert len(self.market_data.result['trade_data'].index) == 3
+
+    def test_global_lock(self):
+        # TODO: this test depends on redis... mock?
+        md1 = MarketData('gdax')
+        md2 = MarketData('gdax')
+
+        # Check they have different id's
+        assert md1._id != md2._id
+
+        # Test manually locking
+        md1.lock()
+        with pytest.raises(Exception) as e_info:
+            md2.lock()
+
+        md1.release()
+        # Ensure I can release the lock
+        assert md1._check_lock() is None
+
+        # Test locking via context handler
+        with md1 as _md1:
+            with pytest.raises(Exception) as e_info:
+                md2.lock()
+
+        # Ensure context handler released cleanly
+        assert md1._check_lock() is None
+
+    @pytest.mark.usefixtures("mock_exchange")
+    def test_save(self):
+        self.market_data.result.clear()
+
+        self.market_data = self.market_data.get_trend('BTC/USD', freq='1d', wait=False)
+        self.market_data = self.market_data.get_trades('BTC/USD', wait=False)
 
         self.market_data.save()
 
-    def test_global_lock(self):
-        # ipdb.set_trace()
-        test_lock = {'id': 12345, 'expire': 0}
-        r.set('lock_gdax', json.dumps(test_lock))
-        
-        # Lock has expired
-        self.market_data.lock()
-
-        expire_time = datetime.datetime.now() + datetime.timedelta(1)
-        test_lock2 = {'id': 12345, 'expire': expire_time.timestamp()}
-
-        # Lock has not expired, but belongs to market_data
-        self.market_data._id = 12345
-        self.market_data.release()
-
-
-    def test_wait(self):
-        task1 = '{"task": "trade_data", "symbol": "ETH/EUR"}'
-        task2 = '{"task": "trade_data", "symbol": "BTC/USD"}'
-
-        r.delete('gdax-tasks')
-        r.lpush('gdax-tasks', task1, task2)
-
-        get_exchange_data('gdax')
-
-
-
-# def test_poll_new_trades():
-#     poll_new_trades('trade_data')
-#     get_exchange_data('gdax')
+        assert self.market_data.result == {}
 
 
