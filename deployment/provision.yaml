@@ -10,9 +10,10 @@
     initialize_database: true
     initial_exchanges: "gdax"
   roles:
-    # - common
-    # - docker
-    # - mysql
+    - common
+    - docker
+    - mysql
     - influxdb
-    # - redis
+    - grafana
+    - redis
     - vegamite

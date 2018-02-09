@@ -1,0 +1,16 @@
+#################################### Server ####################################
+[server]
+# Protocol (http or https)
+;protocol = {{ grafana_protocol}}
+
+# The ip address to bind to, empty will bind to all interfaces
+;http_addr =
+
+# The http port  to use
+;http_port = {{ grafana_port }}
+
+# The public facing domain name used to access grafana from a browser
+;domain = {{ hostvars.production }}
+
+# The full public facing url
+;root_url = %(protocol)s://%(domain)s:%(http_port)s/

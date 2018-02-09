@@ -1,0 +1,39 @@
+---
+- name: Ensure grafana dirs exist
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: deploy
+    group: docker
+    mode: 0775
+    recurse: yes
+  with_items:
+    - "{{ grafana_conf_dir }}"
+    - "{{ grafana_lib_dir }}"
+
+- name: Copy grafana configuration file
+  become: true
+  become_user: deploy
+  template:
+    src: grafana.ini.j2
+    dest: "{{ grafana_conf_dir }}/grafana.ini"
+    mode: 0755
+
+- name: Deploy grafana container
+  become: true
+  become_user: deploy
+  docker_container:
+    env:
+      PYTHONPATH: "{{ ansible_env.PYTHONPATH }}"
+    image: grafana/grafana
+    name: "{{ grafana_container_name }}"
+    ports:
+      - "{{ grafana_port }}:{{ grafana_port }}"
+    pull: true
+    recreate: true
+    restart_policy: always
+    state: "{{ grafana_state }}"
+    volumes:
+      - "{{ grafana_conf_dir }}:/etc/grafana:ro"
+      - "{{ grafana_lib_dir }}:/var/lib/grafana:rw"

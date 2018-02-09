@@ -1,0 +1,8 @@
+# ---
+grafana_backups_dir: "{{ ansible_env.APPLICATION_HOME }}/volumes/grafana/backups"
+grafana_conf_dir: "{{ ansible_env.APPLICATION_HOME }}/conf/grafana"
+grafana_container_name: grafana
+grafana_lib_dir: "{{ ansible_env.APPLICATION_HOME }}/volumes/grafana"
+grafana_port: 3000
+grafana_state: started
+grafana_protocol: http

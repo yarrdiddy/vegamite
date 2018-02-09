@@ -25,10 +25,13 @@ Vegamite depends on InfluxDB, MySQL and redis, so these dependencies will need t
 To configure, simply set up the configurations for each in /settings.yaml.
 
 To deploy, create a python 3 virtualenv and run:
+
     $ pip install --upgrade .
+
 from the root directory.
 
 To start, simply start the celery, and celerybeat workers, eg:
+
     $ celery -A vegamite.tasks worker -B --loglevel=info
 
 Alternatively a celeryd configuration template is included in the deployment directory.
