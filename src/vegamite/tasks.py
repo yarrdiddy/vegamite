@@ -38,12 +38,6 @@ celery.conf.beat_schedule = {
         'schedule': 30.0,
         'args': ['trade_data']
     },
-    # 'queue_tasks_trends': {
-    #     'task': 'vegamite.tasks.queue_tasks',
-    #     'schedule': 60.0,
-    #     'args': ['trend_data'],
-    #     'kwargs': {'freq': '5m'}
-    # },
     'run_market_data_tasks':{
         'task': 'vegamite.tasks.poll_exchanges',
         'schedule': 10.0,
@@ -99,25 +93,16 @@ def queue_tasks(data_type, **kwargs):
         # Pending tasks will be added to a queue in redis
         # This is deliberately kept outside of celery in order to dynamically allocate asynchronous execution on each exchange.
         # tl;dr this will prevent excess calls on any one exchange.
-        # pending_tasks = r.lrange('%s-tasks' % exchange, 0, -1)
-        # pending_tasks = [json.loads(i.decode()) for i in pending_tasks]
-    
-        # if _task not in pending_tasks:
-        #     r.lpush('%s-tasks' % exchange, _task)
         r.sadd('%s-tasks' % exchange, _task)
 
     for exchange in exchanges:
         r.sadd('exchange-queue', exchange)
-    # print(r.smembers('exchange-queue'))
     session.close()
 
 
 
 @celery.task()
 def poll_exchanges():
-    # session = database.get_session()
-    # rows = session.query(Market.exchange_code).filter(Market.track_data=='T').distinct()
-
     while True:
         _exchange = r.spop('exchange-queue')
         if _exchange is None:
@@ -127,7 +112,6 @@ def poll_exchanges():
 
 @celery.task()
 def get_exchange_data(exchange):
-    # import ipdb; ipdb.set_trace()
     market_data = MarketData(exchange)
 
     while True:
@@ -144,8 +128,6 @@ def get_exchange_data(exchange):
 
         with market_data as m:
             try:
-                # print(r.lrange('%s-tasks' % exchange, 0, -1))
-                # print(r.smembers('%s-tasks' % exchange))
                 if data_type == 'trade_data':
                     m.get_trades(symbol).save()
                 elif data_type == 'trend_data':
@@ -153,48 +135,3 @@ def get_exchange_data(exchange):
 
             except Exception as e:
                 continue
-
-
-
-@celery.task()
-def query_gdax_ohlcv():
-    ohlcv_data = exchange.get_trend('BTC/USD', '1m')
-    logger.debug('Collected gdax %s rows of ohlcv data' % len(ohlcv_data.index))
-    
-    ts_client.write_dataframe(
-        ohlcv_data,
-        'test_data', 
-        tags={
-            'exchange': 'gdax',
-            'symbol': 'BTC/USD',
-            'resolution': '1m'
-        }, 
-        field_columns=['open', 'high', 'low', 'close', 'volume'],
-    )
-    logger.debug('Wrote %s rows to Influxdb' % len(ohlcv_data.index))
-
-
-# celery.conf.beat_schedule = {
-#     'query-every-10-seconds': {
-#         'task': 'vegamite.vegamite.query_gdax_ohlcv',
-#         'schedule': 10.0
-#     }
-# }
-
-# @celery.task()
-
-
-
-# @celery.on_after_configure.connect
-# def setup_periodic_tasks(sender, **kwargs):
-#     # TODO: Read database to get list of markets I want to track, and set them up
-#     sender.add_periodic_task(3.0, get_trades.s('gdax', 'BTC/USD'), name='gdax-BTC/USD')
-
-
-# THIS MIGHT BE USEFUL
-# @worker_ready.connect
-# def start_polling(sender, **kwargs):
-#     #pass
-#     with sender.app.connection() as conn:
-#         sender.app.send_task('vegamite.vegamite.poll_trades', connection=conn)
-

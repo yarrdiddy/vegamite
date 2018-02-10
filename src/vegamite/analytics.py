@@ -3,9 +3,10 @@ from numpy import log, exp, mean, std, sqrt
 from numpy.random import randn
 
 from vegamite.data import TimeSeriesClient, MarketData
+from vegamite.base import BaseAnalytic
 
 
-class Analytic(object):
+class Analytic(BaseAnalytic):
     """
     Analytics class - for now. Probably break it up.
     """
