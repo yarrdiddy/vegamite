@@ -44,19 +44,19 @@ celery.conf.beat_schedule = {
     },
     'poll_5m_trend': {
         'task': 'vegamite.tasks.queue_tasks',
-        'schedule': crontab(minute=0, hour='*'),
+        'schedule': crontab(minute='*/15', hour='*'),
         'args': ['trend_data'],
         'kwargs': {'freq': '5m'}
     },
     'poll_1h_trend': {
         'task': 'vegamite.tasks.queue_tasks',
-        'schedule': crontab(minute=0, hour=0, day_of_week='*'),
+        'schedule': crontab(minute='0', hour='*/3', day_of_week='*'),
         'args': ['trend_data'],
         'kwargs': {'freq': '1h'}
     },
     'poll_1d_trend': {
         'task': 'vegamite.tasks.queue_tasks',
-        'schedule': crontab(minute=15, hour=0, day_of_week='*'),
+        'schedule': crontab(minute='15', hour='0', day_of_week='*'),
         'args': ['trend_data'],
         'kwargs': {'freq': '1d'}
     }

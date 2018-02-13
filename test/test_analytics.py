@@ -1,12 +1,23 @@
 import pytest
 
-from vegamite.analytics import PriceSimulation
+from vegamite.analytics.simulation import PriceSimulation
+from vegamite.analytics.averages import EWMA
+
+import ipdb
 
 def test_simulation_run():
-	sim = PriceSimulation('gdax', 'BTC/USD', '5m')
+	ipdb.set_trace()
+	sim = PriceSimulation('gdax', 'BTC/USD', '5m', time_range='90 days')
 
 	sim = sim.fetch()
 	# sim = sim.run()
-	import ipdb; ipdb.set_trace()
-	for i in range(1000):
+	
+	for i in range(10):
 		sim = sim.run().save()
+
+def test_ewma():
+	ewma = EWMA('gdax', 'BTC/USD', '5m', time_range='90 days')
+
+	ewma  = ewma.fetch()
+	ewma = ewma.run()
+	# ewma = ewma.save()

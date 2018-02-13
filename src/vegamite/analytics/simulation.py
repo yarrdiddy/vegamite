@@ -1,13 +1,11 @@
-
 import datetime
-import re
 
 from numpy import log, exp, mean, std, sqrt
 from numpy.random import randn
 
 from vegamite.data import TimeSeriesClient, MarketData
 from vegamite.analytics.base import Analytic
-
+from vegamite.utils.timeutil import parse_time_range
 
 
 class PriceSimulation(Analytic):
@@ -21,7 +19,7 @@ class PriceSimulation(Analytic):
         - Save
     """
 
-    def __init__(self, exchange, symbol, freq):
+    def __init__(self, exchange, symbol, freq, **kwargs):
 
         self.exchange = exchange
         self.symbol = symbol
@@ -35,27 +33,33 @@ class PriceSimulation(Analytic):
 
         self.market_data = MarketData(exchange)
 
+        self.configure(**kwargs)
+
         super().__init__()
 
 
     def configure(self, **kwargs):
-        end_time = kwargs.get('end_time')
-        start_time = kwargs.get('start_time')
-        for t in [start_time, end_time]:
-            if re.match('^\d[m|d|h]', t) is not None:
-                pass
+        """
+        Configure the price simulation.
+        """
+        self._set_time_range(**kwargs)
+        
         return self
 
     def fetch(self):
-        # TODO: fetch should have a from argument
         if self.end_time is None:
             end_time = int(datetime.datetime.utcnow().timestamp() * 1e9)
+        else:
+            end_time = int(self.end_time * 1e9)
+
+        if self.start_time != 0:
+            start_time = int(self.start_time * 1e9)
 
         query_params = dict(
             exchange=self.exchange,
             symbol=self.symbol,
             freq=self.freq,
-            start_time=start_time,
+            start_time=self.start_time,
             end_time=end_time,
         )
         query_data = self.ts_client.client.query(
@@ -73,11 +77,13 @@ class PriceSimulation(Analytic):
         return self
 
     def run(self):
+        if self.data is None:
+            return self
         # Copy data to work on
         _data = self.data.copy()
 
         # Log returns
-        _data['return'] = log(data['close'] / _data['open'])
+        _data['return'] = log(_data['close'] / _data['open'])
 
         # Return stats for data set
         daily_volatility = std(_data['return'])
@@ -122,12 +128,14 @@ class PriceSimulation(Analytic):
         return self
 
     def save(self):
+        if self.result is None:
+            return self
         # Save the simulation run with its metadata
-        ts_client.write_dataframe(
+        self.ts_client.write_dataframe(
             self.result,
             'simulation_result',
             tags={
-                'run_time': self.run_time.strftime(Analytic.RUNTIME_FORMAT), 
+                'run_time': self.run_time.strftime(PriceSimulation.RUNTIME_FORMAT), 
                 'method': self.method
             },
             field_columns=['price'],
@@ -137,6 +145,5 @@ class PriceSimulation(Analytic):
         # Increment the run count here because we only care about saved runs
         self.run_count += 1
         return self
-
 
 
