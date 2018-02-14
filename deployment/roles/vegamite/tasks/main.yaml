@@ -16,8 +16,19 @@
   stat: path=/etc/init.d/celeryd
   register: service_status
 
+- name: Celery daemon config
+  become: true
+  template:
+    src: "{{ item.name }}"
+    dest: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { name: celeryd_config.j2, path: "/etc/default/celeryd", mode: "u=rw,g=r,o=r"}
+    - { name: celeryd.j2, path: "/etc/init.d/celeryd", mode: "u=rwx,g=rx,o=rx" }
+
 - name: Stop Celery Service
   become: true
+  become_user: root
   command: "/etc/init.d/celeryd stop"
   when: service_status.stat.exists
 
