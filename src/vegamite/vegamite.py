@@ -18,23 +18,24 @@ app.config.update(
 
 celery = make_celery(app)
 
-@app.route("/")
-def hello():
-    return 'Hello World'
+@app.route("/", methods=['GET', 'POST'])
+def test_success():
+    return jsonify({'success': True}), 200, {'ContentType':'application/json'}
 
+@app.route("/search", methods=['GET', 'POST'])
+def search():
+    print(request)
+    print(request.data)
 
-class Pair:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+@app.route("/query", methods=['GET', 'POST'])
+def query():
+    print(request)
+    print(request.data)
 
-    def __repr__(self):
-        return 'Pair({0.x!r}, {0.y!r})'.format(self)
-
-    def __str__(self):
-        return '{0.x!s}, {0.y!s}'.format(self)
-
-
+@app.route("/annotations", methods=['GET', 'POST'])
+def annotations():
+    print(request)
+    print(request.data)
 
 if __name__ == '__main__':
     app.run(debug=True)

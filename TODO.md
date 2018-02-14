@@ -2,8 +2,8 @@
 
 ## Build/Deploy/Document
 
-* Default configuration file
-* Deploy script - or figure out how to properly deploy via docker etc.
+* Default configuration file - DONE / ansible
+* Deploy script - or figure out how to properly deploy via docker etc. - DONE ansible
 * Start writing documentation
 * Learn more about what the setup.py script is doing
 * Better way of managing versioning - probably one single standalone file
@@ -26,14 +26,14 @@
 
 
 Ansible modes:
-* Provision new instance
+* Provision new instance - DONE
 	* Set up users
 	* Install dependencies
 	* Docker images
 	* Git pull install etc
 	* Initialize database
 	* Start worker
-* Deploy new version of app
+* Deploy new version of app - DONE
 	* Stop worker
 	* Git pull
 	* Install
@@ -50,7 +50,7 @@ Ansible modes:
 * Organize tasks back into tasks module. DONE
 * Logs should quiet down
 * Logs should be rotated
-* Externalize celery beat schedule
+* Externalize celery beat schedule - DONE, well enough
 * Instantiate singletons per worker init.
 
 
@@ -61,7 +61,7 @@ Ansible modes:
 * Data flow design - Mostly DONE
 * Database: MySQL container setup, external volume - DONE
 * Database: Base data, tracking table - DONE
-* Connection pool for all databases
+* Connection pool for all databases - DONE / default / singletons
 	* MySQL - Now implemented as singleton, has its own pool.
 	* InfluxDB - Now a singleton, has its own pool.
 * Cache tracked markets, periodically updating the cache on its own schedule.
@@ -77,8 +77,6 @@ Data to store:
 ## Analytics
 
 * Most basic analytics will be covered by pandas, so we can use these directly
-
-
 
 
 ## Test coverage
