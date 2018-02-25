@@ -7,6 +7,7 @@ from celery.utils.log import get_task_logger
 from vegamite.data import MarketData, TimeSeriesClient, redis_client, Database
 from vegamite.model import Market
 from vegamite.config import config
+from vegamite.analytics.simulation import PriceSimulation
 
 ts_client = TimeSeriesClient()
 r = redis_client()
@@ -44,7 +45,7 @@ celery.conf.beat_schedule = {
     },
     'poll_5m_trend': {
         'task': 'vegamite.tasks.queue_tasks',
-        'schedule': crontab(minute='*/15', hour='*'),
+        'schedule': 30.0, #crontab(minute='*/15', hour='*'),
         'args': ['trend_data'],
         'kwargs': {'freq': '5m'}
     },
@@ -59,6 +60,10 @@ celery.conf.beat_schedule = {
         'schedule': crontab(minute='15', hour='0', day_of_week='*'),
         'args': ['trend_data'],
         'kwargs': {'freq': '1d'}
+    },
+    'run_simulations': {
+        'task': 'vegamite.tasks.run_simulations',
+        'schedule': crontab(hour='*')
     }
 }
 
@@ -135,3 +140,29 @@ def get_exchange_data(exchange):
 
             except Exception as e:
                 continue
+
+@celery.task()
+def run_simulations():
+    session = database.get_session()
+    rows = session.query(Market).filter(Market.backtest_market=='T')
+    
+    for row in rows:
+        exchange = row.exchange_code.lower()
+        symbol = row.symbol
+        logger.debug('Running simulation: %s, %s' % (exchange, symbol))
+        run_single_simulation.delay(exchange, symbol, 1000)
+
+    session.close()
+
+
+@celery.task()
+def run_single_simulation(exchange, symbol, iterations):
+    simulation = PriceSimulation(exchange, symbol, '5m', time_range='7 days')
+    simulation = simulation.fetch()
+
+    for i in range(iterations):
+        simulation = simulation.run().save()
+
+
+
+

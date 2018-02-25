@@ -2,6 +2,7 @@ import datetime
 
 from numpy import log, exp, mean, std, sqrt
 from numpy.random import randn
+from pandas import DataFrame, concat
 
 from vegamite.data import TimeSeriesClient, MarketData
 from vegamite.analytics.base import Analytic
@@ -32,6 +33,7 @@ class PriceSimulation(Analytic):
         self.method = 'geometric_brownian_motion'
 
         self.market_data = MarketData(exchange)
+        self.result = DataFrame()
 
         self.configure(**kwargs)
 
@@ -127,6 +129,7 @@ class PriceSimulation(Analytic):
 
         return self
 
+
     def save(self):
         if self.result is None:
             return self
@@ -135,7 +138,6 @@ class PriceSimulation(Analytic):
             self.result,
             'simulation_result',
             tags={
-                'run_time': self.run_time.strftime(PriceSimulation.RUNTIME_FORMAT), 
                 'method': self.method
             },
             field_columns=['price'],

@@ -36,6 +36,7 @@ class Market(Base):
 	track_data = Column(String(1))
 	trade_market = Column(String(1))
 	last_updated = Column(DateTime) # datetime,
+	backtest_market = Column(String(1))
 	
 	def __repr__(self):
 		return """<Markets(
@@ -47,7 +48,8 @@ class Market(Base):
 			quote_currency='%s',
 			track_data=%s,
 			trade_market=%s,
-			last_updated='%s'
+			last_updated='%s',
+			backtest_market='%s'
 		)>""" % (
 			self.market_id, 
 			self.ccxt_market_id,
@@ -57,7 +59,8 @@ class Market(Base):
 			self.quote_currency,
 			self.track_data,
 			self.trade_market,
-			self.last_updated
+			self.last_updated,
+			self.backtest_market
 		)
 
 

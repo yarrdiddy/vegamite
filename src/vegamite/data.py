@@ -195,7 +195,7 @@ class MarketData(object):
         ohlcv = self.exchange.fetch_ohlcv(symbol, freq, since=last_timestamp)
         
         if len(ohlcv) == 0:
-            logger.info('Fetched no trend data.')
+            logger.debug('Fetched no trend data.')
             return self
 
         data_frame = DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
@@ -206,7 +206,7 @@ class MarketData(object):
         data_frame = data_frame.set_index('pd_timestamp')
 
         self.result['trend_data'] = data_frame
-        logger.info('Fetched %s trend: %s, %s.' % (len(data_frame.index), self.exchange_code, symbol))
+        logger.debug('Fetched %s trend: %s, %s.' % (len(data_frame.index), self.exchange_code, symbol))
         return self
 
     def get_trades(self, symbol, since=None, latest=True, wait=True):
@@ -226,7 +226,7 @@ class MarketData(object):
         trades = self.exchange.fetch_trades(symbol, since=last_timestamp)
         
         if len(trades) == 0:
-            logger.info('Fetched no trade data.')
+            logger.debug('Fetched no trade data.')
             return self
 
         data_frame = DataFrame(trades, columns=trades[0].keys())
@@ -235,7 +235,7 @@ class MarketData(object):
         data_frame.index = data_frame['pd_timestamp']
 
         self.result['trade_data'] = data_frame
-        logger.info('Fetched %s trades: %s, %s.' % (len(data_frame.index), self.exchange_code, symbol))
+        logger.debug('Fetched %s trades: %s, %s.' % (len(data_frame.index), self.exchange_code, symbol))
         return self
 
     def save(self):
