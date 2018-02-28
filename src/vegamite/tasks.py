@@ -3,7 +3,7 @@ import time, json
 from celery import Celery
 from celery.schedules import crontab
 from celery.utils.log import get_task_logger
-from kumbu import Queue
+from kombu import Queue
 
 from vegamite.data import MarketData, TimeSeriesClient, redis_client, Database
 from vegamite.model import Market
