@@ -184,7 +184,7 @@ class MarketData(object):
         last_timestamp = 0
         
         if latest:
-            last_saved = self.ts_client.get_last(self.exchange_code, symbol, 'trend_data')
+            last_saved = self.ts_client.get_last(self.exchange_code, symbol, 'trend_data', extra_filters={'freq': freq})
 
             if len(last_saved.index) > 0:
                 last_timestamp = int(last_saved['last_timestamp'])
