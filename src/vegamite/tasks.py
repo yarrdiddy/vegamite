@@ -38,8 +38,8 @@ celery.conf.task_queues = (
     Queue('analytics'),
 )
 
-app.control.add_consumer('data', reply=True)
-app.control.add_consumer('analytics', reply=True)
+celery.control.add_consumer('data', reply=True)
+celery.control.add_consumer('analytics', reply=True)
 
 celery.conf.beat_schedule = {
     'queue_tasks_trades': {
