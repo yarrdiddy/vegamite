@@ -71,7 +71,7 @@ celery.conf.beat_schedule = {
     },
     'run_simulations': {
         'task': 'vegamite.tasks.run_simulations',
-        'schedule': #crontab(hour='*')
+        'schedule': 60.0#crontab(hour='*')
     }
 }
 
