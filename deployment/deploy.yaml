@@ -8,4 +8,5 @@
     username: ubuntu
     initialize_database: false
   roles:
+    - common
     - vegamite

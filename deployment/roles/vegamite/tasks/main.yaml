@@ -11,6 +11,7 @@
     celery_user: deploy
     celery_group: deploy
     celery_opts: "-B"
+    initialize_database: true
 
 - name: Check if Celery Service Exists
   stat: path=/etc/init.d/celeryd

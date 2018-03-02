@@ -81,7 +81,6 @@ class TimeSeriesClient(metaclass=Singleton):
         """
         Return most recently saved data point.
         """
-        import ipdb; ipdb.set_trace()
         _extra_filters = kwargs.get('extra_filters')
         _extra_sql = ''
         if _extra_filters:
