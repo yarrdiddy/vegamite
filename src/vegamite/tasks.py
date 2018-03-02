@@ -33,13 +33,13 @@ def make_celery(app):
     celery.Task = ContextTask
     return celery
     
-celery.conf.task_queues = (
-    Queue('data'),
-    Queue('analytics'),
-)
+# celery.conf.task_queues = (
+#     Queue('data'),
+#     Queue('analytics'),
+# )
 
-celery.control.add_consumer('data', reply=True)
-celery.control.add_consumer('analytics', reply=True)
+# celery.control.add_consumer('data', reply=True)
+# celery.control.add_consumer('analytics', reply=True)
 
 celery.conf.beat_schedule = {
     'queue_tasks_trades': {
@@ -69,14 +69,14 @@ celery.conf.beat_schedule = {
         'args': ['trend_data'],
         'kwargs': {'freq': '1d'}
     },
-    'run_simulations': {
-        'task': 'vegamite.tasks.run_simulations',
-        'schedule': 60.0#crontab(hour='*')
-    }
+    # 'run_simulations': {
+    #     'task': 'vegamite.tasks.run_simulations',
+    #     'schedule': crontab(hour='*')
+    # }
 }
 
 
-@celery.task(queue='data')
+@celery.task()
 def queue_tasks(data_type, **kwargs):
     # Read data from redis, fallback to database if empty
     
@@ -114,7 +114,7 @@ def queue_tasks(data_type, **kwargs):
 
 
 
-@celery.task(queue='data')
+@celery.task()
 def poll_exchanges():
     while True:
         _exchange = r.spop('exchange-queue')
@@ -123,7 +123,7 @@ def poll_exchanges():
         get_exchange_data.delay(_exchange.decode())
     
 
-@celery.task(queue='data')
+@celery.task()
 def get_exchange_data(exchange):
     market_data = MarketData(exchange)
 
@@ -149,8 +149,9 @@ def get_exchange_data(exchange):
             except Exception as e:
                 continue
 
-@celery.task(queue='analytics')
+@celery.task()
 def run_simulations():
+    # import ipdb; ipdb.set_trace()
     session = database.get_session()
     rows = session.query(Market).filter(Market.backtest_market=='T')
     
@@ -163,7 +164,7 @@ def run_simulations():
     session.close()
 
 
-@celery.task(queue='analytics')
+@celery.task()
 def run_single_simulation(exchange, symbol, iterations):
     simulation = PriceSimulation(exchange, symbol, '5m', time_range='7 days')
     simulation = simulation.fetch()

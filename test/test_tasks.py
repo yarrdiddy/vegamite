@@ -8,7 +8,7 @@ def test_poll_exchanges():
 
 
 def test_sim_task():
-	# run_simulations()
+	run_simulations()
 	run_single_simulation('gdax', 'BTC/USD', 10)
 
 # def test_poll_new_trades():

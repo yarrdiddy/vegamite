@@ -81,11 +81,12 @@ class TimeSeriesClient(metaclass=Singleton):
         """
         Return most recently saved data point.
         """
+        import ipdb; ipdb.set_trace()
         _extra_filters = kwargs.get('extra_filters')
         _extra_sql = ''
         if _extra_filters:
-            for key, val in _extra_filter.items():
-                _extra_sql += 'and %s = %s ' % (key, val)
+            for key, val in _extra_filters.items():
+                _extra_sql += "and %s = '%s'" % (key, val)
 
         query_parameters = dict(
             measurement=measurement,
