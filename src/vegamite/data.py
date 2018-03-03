@@ -196,7 +196,7 @@ class MarketData(object):
         ohlcv = self.exchange.fetch_ohlcv(symbol, freq, since=last_timestamp)
         
         if len(ohlcv) == 0:
-            logger.debug('Fetched no trend data.')
+            logger.debug('Fetched no trend data sine %s.' % last_timestamp)
             return self
 
         data_frame = DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
