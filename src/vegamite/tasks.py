@@ -69,10 +69,10 @@ celery.conf.beat_schedule = {
         'args': ['trend_data'],
         'kwargs': {'freq': '1d'}
     },
-    # 'run_simulations': {
-    #     'task': 'vegamite.tasks.run_simulations',
-    #     'schedule': crontab(hour='*')
-    # }
+    'run_simulations': {
+        'task': 'vegamite.tasks.run_simulations',
+        'schedule': crontab(minute='30', hour='*')
+    }
 }
 
 
