@@ -93,9 +93,9 @@ class TestMarketData(object):
         time.sleep(1)
         assert len(markets) > 0
 
-    @pytest.mark.usefixtures("mock_exchange")
+    # @pytest.mark.usefixtures("mock_exchange")
     def test_get_trend(self):
-        self.market_data = self.market_data.get_trend('BTC/USD', freq='1d', wait=False)
+        self.market_data = self.market_data.get_trend('BTC/USD', freq='5m', wait=False)
         assert len(self.market_data.result['trend_data'].index) == 10
 
     @pytest.mark.usefixtures("mock_exchange")

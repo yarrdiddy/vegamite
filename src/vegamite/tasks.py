@@ -144,7 +144,10 @@ def get_exchange_data(exchange):
                 if data_type == 'trade_data':
                     m.get_trades(symbol).save()
                 elif data_type == 'trend_data':
-                    m.get_trend(symbol, freq=freq).save()
+                    m = m.get_trend(symbol, freq=freq)
+                    if not m.result.get('trend_data'):
+                        r.sadd('%s-tasks' % exchange, json.dumps(_task))
+                    m.save()
 
             except Exception as e:
                 continue

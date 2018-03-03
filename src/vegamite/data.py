@@ -180,6 +180,7 @@ class MarketData(object):
         return self.exchange.markets
 
     def get_trend(self, symbol, freq='1d', since=None, latest=True, wait=True):
+        # import ipdb; ipdb.set_trace()
         self._check_lock()
         last_timestamp = 0
         
