@@ -193,6 +193,8 @@ class MarketData(object):
         ohlcv = []
         if wait:
             time.sleep(self.exchange.rateLimit / 1000)
+        if last_timestamp == 0:
+            last_timestamp = None
         ohlcv = self.exchange.fetch_ohlcv(symbol, freq, since=last_timestamp)
         
         if len(ohlcv) == 0:
