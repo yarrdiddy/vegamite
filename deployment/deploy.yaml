@@ -1,5 +1,5 @@
 ---
-- hosts: development
+- hosts: production
   environment:
     APPLICATION_HOME: "/app"
     APP_HOME: "/app"
