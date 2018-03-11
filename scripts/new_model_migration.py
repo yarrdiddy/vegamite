@@ -42,7 +42,7 @@ def set_policies():
                     min(price) as low, 
                     last(price) as close, 
                     sum(amount) as volume 
-            into    90day.trend
+            into    '90day'.'trend'
             from    trade_data 
             group by 
                 time(5m), exchange, symbol
