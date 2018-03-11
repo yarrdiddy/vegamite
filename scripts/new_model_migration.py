@@ -34,6 +34,12 @@ def set_policies():
     ts.client.create_retention_policy('90day', '90d', 1, database='vegamite')
     ts.client.create_retention_policy('1year', '52w', 1, database='vegamite')
 
+    existing_cqs = ts.client.query('show continuous queries')
+    vegamite_cqs = existing_cqs['vegamite']
+    for cq in vegamite_cqs:
+        if cq.get('name') == 'raw_trend':
+            ts.client.query('drop continuous query raw_trend on vegamite')
+
     ts.client.query("""
         CREATE CONTINUOUS QUERY "raw_trend" ON "vegamite"
         BEGIN
@@ -42,8 +48,8 @@ def set_policies():
                     min("price") as low, 
                     last("price") as close, 
                     sum("amount") as volume 
-            into    "90day"."trend"
-            from    "90day".trade_data" 
+            into    "vegamite"."90day"."trend"
+            from    "vegamite"."90day"."trade_data" 
             group by 
                 time(5m), "exchange", "symbol"
         END
