@@ -4,3 +4,4 @@ github_repo: "ssh://git@github.com/yarrdiddy/vegamite.git"
 privatekey_name: id_rsa_vegamite
 initialize_database: true
 initial_exchanges: gdax
+git_branch: NEW_MODEL

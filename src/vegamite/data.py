@@ -12,6 +12,8 @@ from vegamite.config import config
 DB_CONNECTION = "mysql://{user}:{password}@{host}:{port}/{database}"
 
 MEASUREMENTS = ['trade_data', 'trend_data']
+POLICIES = ['rp_trade', 'rp_trend']
+MEASUREMENT_POLICIES = dict(zip(MEASUREMENTS, POLICIES))
 
 logger = get_task_logger(__name__)
 
@@ -53,8 +55,6 @@ def redis_client():
 class TimeSeriesClient(metaclass=Singleton):
     """
     Time series object for interacting with the InfluxDB instance. Get/retrieve methods for time series data.
-    
-    TODO: Why do I need to wrap this guy at all? Probably something simpler that just handles the connection.
     """
     def __init__(self):
         self.client = DataFrameClient(
@@ -67,7 +67,7 @@ class TimeSeriesClient(metaclass=Singleton):
         self.protocol = 'json'
         self.trade_data_table = 'trade_data'
 
-    def write_dataframe(self, dataframe, series, tags=None, field_columns=None, tag_columns=None):
+    def write_dataframe(self, dataframe, series, tags=None, field_columns=None, tag_columns=None, retention_policy=None):
         logger.debug('Wrote %s points to InfluxDB' % len(dataframe.index))
         self.client.write_points(
             dataframe, 
@@ -75,7 +75,9 @@ class TimeSeriesClient(metaclass=Singleton):
             tags, 
             protocol=self.protocol,
             field_columns=field_columns,
-            tag_columns=tag_columns)
+            tag_columns=tag_columns,
+            retention_policy=retention_policy
+        )
 
     def get_last(self, exchange, symbol, measurement, **kwargs):
         """
@@ -241,7 +243,7 @@ class MarketData(object):
         logger.debug('Fetched %s trades: %s, %s.' % (len(data_frame.index), self.exchange_code, symbol))
         return self
 
-    def save(self):
+    def save(self, retention_policy=None):
 
         _fields = {
             'trade_data': ['id', 'price', 'amount', 'timestamp'],
@@ -261,7 +263,8 @@ class MarketData(object):
                     tags={
                         'exchange': self.exchange_code
                     },
-                    tag_columns=_tags[result_name]
+                    tag_columns=_tags[result_name],
+                    retention_policy=retention_policy
                 )
             except Exception as e:
                 logger.info(e)

@@ -51,28 +51,28 @@ celery.conf.beat_schedule = {
         'task': 'vegamite.tasks.poll_exchanges',
         'schedule': 10.0,
     },
-    'poll_5m_trend': {
-        'task': 'vegamite.tasks.queue_tasks',
-        'schedule': crontab(minute='*/15', hour='*'),
-        'args': ['trend_data'],
-        'kwargs': {'freq': '5m'}
-    },
-    'poll_1h_trend': {
-        'task': 'vegamite.tasks.queue_tasks',
-        'schedule': crontab(minute='0', hour='*/3', day_of_week='*'),
-        'args': ['trend_data'],
-        'kwargs': {'freq': '1h'}
-    },
-    'poll_1d_trend': {
-        'task': 'vegamite.tasks.queue_tasks',
-        'schedule': crontab(minute='15', hour='0', day_of_week='*'),
-        'args': ['trend_data'],
-        'kwargs': {'freq': '1d'}
-    },
-    'run_simulations': {
-        'task': 'vegamite.tasks.run_simulations',
-        'schedule': crontab(minute='30', hour='*')
-    }
+    # 'poll_5m_trend': {
+    #     'task': 'vegamite.tasks.queue_tasks',
+    #     'schedule': crontab(minute='*/15', hour='*'),
+    #     'args': ['trend_data'],
+    #     'kwargs': {'freq': '5m'}
+    # },
+    # 'poll_1h_trend': {
+    #     'task': 'vegamite.tasks.queue_tasks',
+    #     'schedule': crontab(minute='0', hour='*/3', day_of_week='*'),
+    #     'args': ['trend_data'],
+    #     'kwargs': {'freq': '1h'}
+    # },
+    # 'poll_1d_trend': {
+    #     'task': 'vegamite.tasks.queue_tasks',
+    #     'schedule': crontab(minute='15', hour='0', day_of_week='*'),
+    #     'args': ['trend_data'],
+    #     'kwargs': {'freq': '1d'}
+    # },
+    # 'run_simulations': {
+    #     'task': 'vegamite.tasks.run_simulations',
+    #     'schedule': crontab(minute='30', hour='*')
+    # }
 }
 
 
@@ -142,7 +142,7 @@ def get_exchange_data(exchange):
         with market_data as m:
             try:
                 if data_type == 'trade_data':
-                    m.get_trades(symbol).save()
+                    m.get_trades(symbol).save(retention_policy='90day')
                 elif data_type == 'trend_data':
                     if m.exchange_code == 'gdax':
                         m = m.get_trend(symbol, freq=freq, latest=False)
