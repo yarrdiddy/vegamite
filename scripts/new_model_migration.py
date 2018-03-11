@@ -32,7 +32,7 @@ ts = TimeSeriesClient()
 def set_policies():
     # "select first(price) as open, max(price) as high, min(price) as low, last(price) as close, sum(amount) as volume from trade_data where exchange='gdax' and symbol = 'BTC/USD' group by time(5m)"
     ts.client.create_retention_policy('90day', '90d', 1, database='vegamite')
-    ts.client.create_retention_policy('1year', '1y', 1, database='vegamite')
+    ts.client.create_retention_policy('1year', '52w', 1, database='vegamite')
 
     ts.client.query("""
         CREATE CONTINUOUS QUERY raw_trend ON vegamite
