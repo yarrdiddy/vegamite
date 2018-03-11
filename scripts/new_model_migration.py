@@ -43,14 +43,18 @@ def set_policies():
                     last("price") as close, 
                     sum("amount") as volume 
             into    "90day"."trend"
-            from    "trade_data" 
+            from    "90day".trade_data" 
             group by 
                 time(5m), "exchange", "symbol"
         END
     """)
 
 def migrate_trade_data():    
-    pass
+    ts.client.query("""
+        select  *
+        into    "90day"."trade_data"
+        from    "trade_data"
+    """)
 
 def migrate_trend_data():
     pass
