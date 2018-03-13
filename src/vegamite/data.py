@@ -228,6 +228,8 @@ class MarketData(object):
         trades = []
         if wait:
             time.sleep(self.exchange.rateLimit / 1000)
+        if last_timestamp == 0:
+            last_timestamp = None
         trades = self.exchange.fetch_trades(symbol, since=last_timestamp)
         
         if len(trades) == 0:
