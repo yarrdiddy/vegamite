@@ -113,14 +113,14 @@
     executable: /bin/bash
   when: initialize_database
 
-- name: Add policies to database
-  become: true
-  become_user: deploy
-  shell: "source ~/.profile && source bin/activate && python vegamite/scripts/new_model_migration.py"
-  args:
-    chdir: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}"
-    executable: /bin/bash
-  once: True
+# - name: Add policies to database
+#   become: true
+#   become_user: deploy
+#   shell: "source ~/.profile && source bin/activate && python vegamite/scripts/new_model_migration.py"
+#   args:
+#     chdir: "{{ ansible_env.APPLICATION_HOME }}/{{ virtualenv_name }}"
+#     executable: /bin/bash
+#   once: True
 
 - name: Celery daemon config
   become: true

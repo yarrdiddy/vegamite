@@ -10,5 +10,5 @@
     initialize_database: false
   roles:
     - common
-    - influxdb
+    # - influxdb
     - vegamite
