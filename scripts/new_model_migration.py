@@ -60,6 +60,7 @@ def migrate_trade_data():
         select  *
         into    "90day"."trade_data"
         from    "trade_data"
+        where   time >= now() - 90d
     """)
 
 def migrate_trend_data():

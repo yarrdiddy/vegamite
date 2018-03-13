@@ -1,6 +1,7 @@
 ---
-- hosts: development
+- hosts: production
   environment:
+    PYTHONPATH: "/home/ubuntu/.local/lib/python2.7/site-packages"
     APPLICATION_HOME: "/app"
     APP_HOME: "/app"
   user: ubuntu
@@ -9,4 +10,5 @@
     initialize_database: false
   roles:
     - common
+    - influxdb
     - vegamite

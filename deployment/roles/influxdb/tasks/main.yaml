@@ -38,3 +38,6 @@
     volumes:
       - "{{ influxdb_conf_dir }}:/etc/influxdb:ro"
       - "{{ influxdb_lib_dir }}:/var/lib/influxdb:rw"
+    log_driver: json-file
+    log_opt:
+      max-size: "100m"
