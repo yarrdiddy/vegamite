@@ -144,10 +144,11 @@ def get_exchange_data(exchange):
         with market_data as m:
             try:
                 if data_type == 'trade_data':
-                    m.get_trades(symbol).save(retention_policy="test_policy")
+                    # TODO: Pull the retention policy out into config
+                    m.get_trades(symbol).save(retention_policy="90day")
                 elif data_type == 'trend_data':
                     if m.exchange_code == 'gdax':
-                        m = m.get_trend(symbol, freq=freq, latest=False)
+                        m = m.get_trend(symbol, freq=freq, latest=True)
                     else:
                         m = m.get_trend(symbol, freq=freq)
                     if not m.result.get('trend_data'):

@@ -14,3 +14,6 @@ def test_sim_task():
 # def test_poll_new_trades():
 #     poll_new_trades('trade_data')
 #     get_exchange_data('gdax')
+
+def test_trades():
+	pass

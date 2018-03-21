@@ -214,16 +214,20 @@ class MarketData(object):
         logger.debug('Fetched %s trend: %s, %s.' % (len(data_frame.index), self.exchange_code, symbol))
         return self
 
-    def get_trades(self, symbol, since=None, latest=True, wait=True):
+    def get_trades(self, symbol, since=None, latest=True, wait=True, max_minutes=58):
         # import ipdb; ipdb.set_trace()
         self._check_lock()
         last_timestamp = 0
         
-        if latest:
+        if since:
+            last_timestamp = since
+        elif latest:
             last_saved = self.ts_client.get_last(self.exchange_code, symbol, 'trade_data')
-
+            last_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=max_minutes)
+            last_timestamp = int(last_timestamp.timestamp() * 1e3)
             if len(last_saved.index) > 0:
-                last_timestamp = int(last_saved['last_timestamp'])
+                last_saved_timestamp = int(last_saved['last_timestamp'])
+                last_timestamp = max(last_timestamp, last_saved_timestamp)
 
         trades = []
         if wait:
@@ -248,7 +252,12 @@ class MarketData(object):
     def save(self, retention_policy=None):
         # import ipdb; ipdb.set_trace()
         _fields = {
-            'trade_data': ['id', 'price', 'amount', 'timestamp'],
+            'trade_data': {
+                'id': 'str', 
+                'price': 'float64', 
+                'amount': 'float64', 
+                'timestamp': 'int64'
+            },
             'trend_data': ['timestamp', 'open', 'high', 'low', 'close', 'volume'] ##
         }
 
@@ -258,9 +267,12 @@ class MarketData(object):
         }
         
         for result_name, result_data in self.result.items():
-            # try:
+            result_data = result_data.astype(_fields[result_name])
+
+            cols = list(_fields[result_name].keys()) + _tags[result_name]
+
             res = self.ts_client.write_dataframe(
-                result_data[_fields[result_name] + _tags[result_name]],
+                result_data[cols],
                 result_name,
                 tags={
                     'exchange': self.exchange_code
@@ -268,9 +280,6 @@ class MarketData(object):
                 tag_columns=_tags[result_name],
                 retention_policy=retention_policy
             )
-            print(res)
-            # except Exception as e:
-            #     logger.info(e)
 
         self.result.clear()
         return self

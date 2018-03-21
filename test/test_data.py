@@ -26,14 +26,15 @@ class MockTSResponse():
 
 
 def test_trades():
+    ipdb.set_trace()
     bn = MarketData('binance')
     gd = MarketData('gdax')
 
     bn = bn.get_trades('ETH/BTC')
     gd = gd.get_trades('BTC/USD')
 
-    bn = bn.save(retention_policy="90day") # 
-    gd = gd.save(retention_policy="90day")
+    bn = bn.save(retention_policy="test_policy") # 
+    gd = gd.save(retention_policy="test_policy")
 
     # bn = bn.save()
     # gd = gd.save()
