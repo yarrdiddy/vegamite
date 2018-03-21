@@ -92,6 +92,8 @@ def queue_tasks(data_type, **kwargs):
         exchange = row.exchange_code.lower()
         symbol = row.symbol
 
+        logger.info('Found: %s, %s' % (exchange, symbol))
+
         if exchange not in exchanges:
             exchanges.append(exchange)
 
@@ -142,7 +144,7 @@ def get_exchange_data(exchange):
         with market_data as m:
             try:
                 if data_type == 'trade_data':
-                    m.get_trades(symbol).save(retention_policy='90day')
+                    m.get_trades(symbol).save(retention_policy="test_policy")
                 elif data_type == 'trend_data':
                     if m.exchange_code == 'gdax':
                         m = m.get_trend(symbol, freq=freq, latest=False)

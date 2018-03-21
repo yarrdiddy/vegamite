@@ -246,7 +246,7 @@ class MarketData(object):
         return self
 
     def save(self, retention_policy=None):
-
+        # import ipdb; ipdb.set_trace()
         _fields = {
             'trade_data': ['id', 'price', 'amount', 'timestamp'],
             'trend_data': ['timestamp', 'open', 'high', 'low', 'close', 'volume'] ##
@@ -258,18 +258,19 @@ class MarketData(object):
         }
         
         for result_name, result_data in self.result.items():
-            try:
-                self.ts_client.write_dataframe(
-                    result_data[_fields[result_name] + _tags[result_name]],
-                    result_name,
-                    tags={
-                        'exchange': self.exchange_code
-                    },
-                    tag_columns=_tags[result_name],
-                    retention_policy=retention_policy
-                )
-            except Exception as e:
-                logger.info(e)
+            # try:
+            res = self.ts_client.write_dataframe(
+                result_data[_fields[result_name] + _tags[result_name]],
+                result_name,
+                tags={
+                    'exchange': self.exchange_code
+                },
+                tag_columns=_tags[result_name],
+                retention_policy=retention_policy
+            )
+            print(res)
+            # except Exception as e:
+            #     logger.info(e)
 
         self.result.clear()
         return self

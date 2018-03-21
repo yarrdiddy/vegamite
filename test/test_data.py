@@ -24,6 +24,21 @@ class MockTSResponse():
         print('yay!')
         return 'cunt!'
 
+
+def test_trades():
+    bn = MarketData('binance')
+    gd = MarketData('gdax')
+
+    bn = bn.get_trades('ETH/BTC')
+    gd = gd.get_trades('BTC/USD')
+
+    bn = bn.save(retention_policy="90day") # 
+    gd = gd.save(retention_policy="90day")
+
+    # bn = bn.save()
+    # gd = gd.save()
+
+
 @pytest.fixture()
 def mock_get_last_query(monkeypatch):
     monkeypatch.setattr('influxdb.DataFrameClient.query', MockTSResponse.get_last_query)

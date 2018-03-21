@@ -8,7 +8,7 @@
   vars:
     username: ubuntu
     initialize_database: true
-    initial_exchanges: "gdax"
+    initial_exchanges: "binance"
   roles:
     - common
     - docker
