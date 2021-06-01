@@ -66,7 +66,7 @@ sphinxcontrib-websupport==1.0.1
 SQLAlchemy==1.2.0
 tornado==4.5.3
 traitlets==4.3.2
-urllib3==1.22
+urllib3==1.26.5
 vine==1.1.4
 wcwidth==0.1.7
 Werkzeug==0.13
